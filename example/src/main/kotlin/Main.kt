@@ -1,14 +1,22 @@
 package dev.redtronics
 
-import dev.redtronics.mokt.MojangGameAuth
-import dev.redtronics.mokt.Provider
 import dev.redtronics.mokt.auth
 import dev.redtronics.mokt.provider.*
-import io.ktor.client.*
-import io.ktor.http.*
 import kotlinx.coroutines.supervisorScope
-import kotlinx.serialization.json.Json
 
 suspend fun main(): Unit = supervisorScope {
+    auth<Microsoft> {
+        clientId = "aa54f7f4-45f6-4f78-b95f-3b6cc98e0b7f"
 
+        device {
+            val code = requestAuthorizationCode()
+
+            displayCode(code!!.userCode) {
+                displayUserCodeInBrowser()
+            }
+
+            val accessResponse = requestAccessToken(code)!!
+            println(accessResponse.accessToken)
+        }
+    }
 }
