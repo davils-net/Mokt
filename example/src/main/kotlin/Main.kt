@@ -15,8 +15,8 @@ suspend fun main(): Unit = supervisorScope {
                 displayUserCodeInBrowser()
             }
 
-            val accessResponse = requestAccessToken(code)!!
-            println(accessResponse.accessToken)
+            val accessResponse = requestAccessToken(code)
+            println(accessResponse?.accessToken)
         }
     }
 }
