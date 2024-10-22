@@ -13,6 +13,7 @@
 
 package dev.redtronics.mokt.provider.builder.device
 
+import com.github.ajalt.mordant.terminal.Terminal
 import dev.redtronics.mokt.openInBrowser
 import dev.redtronics.mokt.provider.html.WebTheme
 import dev.redtronics.mokt.provider.html.userCodePage
@@ -47,6 +48,10 @@ public class UserCodeBuilder internal constructor(
     public var shouldDisplayCode: Boolean = true
 
     public var setUserCodeAutomatically: Boolean = false
+
+    public var terminal: Terminal = Terminal()
+
+    public var printTerminal: (userCode: String) -> Unit = { userCode -> terminal.println(userCode) }
 
     public suspend fun displayUserCodeInBrowser() {
         codeServer = embeddedServer(CIO, localServerUrl.port, localServerUrl.host) {
