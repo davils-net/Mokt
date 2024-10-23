@@ -26,7 +26,7 @@ public class MojangBuilder internal constructor(
     override val httpClient: HttpClient,
     override val json: Json,
     private val xstsResponse: XstsResponse
-) : BaseBuilder() {
+) : MojangBaseAuthBuilder() {
     public val minecraftLoginEndpoint: Url
         get() = Url("https://api.minecraftservices.com/authentication/login_with_xbox")
 
