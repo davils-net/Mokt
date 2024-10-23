@@ -14,6 +14,18 @@ package dev.redtronics.mokt.response
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the response from the Mojang API.
+ *
+ * @property username The username of the user.
+ * @property roles The roles of the user.
+ * @property accessToken The access token of the user.
+ * @property tokenType The type of the access token.
+ * @property expiresIn The expiration time of the access token.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ */
 @Serializable
 public data class MojangResponse(
     public val username: String,

@@ -15,6 +15,20 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the response from the Xbox Live service.
+ *
+ * @property issueInstant The time at which the token was issued.
+ * @property notAfter The expiration time of the token.
+ * @property token The security token provided by the Xbox Live service.
+ * @property displayClaims The display claims provided by the Xbox Live service.
+ *
+ * @see DisplayClaims
+ * @see Instant
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ */
 @Serializable
 public data class XBoxResponse(
     @SerialName("IssueInstant")

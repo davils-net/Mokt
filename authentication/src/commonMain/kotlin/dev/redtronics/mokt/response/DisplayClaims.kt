@@ -13,11 +13,27 @@ package dev.redtronics.mokt.response
 
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the Display Claims from the auth endpoints.
+ *
+ * @property xui The [List] of User Hash Strings.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 @Serializable
 public data class DisplayClaims(
     public val xui: List<Uhs>
 )
 
+/**
+ * Represents the User Hash String (UHS).
+ *
+ * @property uhs The User Hash String.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ */
 @Serializable
 public data class Uhs(
     public val uhs: String

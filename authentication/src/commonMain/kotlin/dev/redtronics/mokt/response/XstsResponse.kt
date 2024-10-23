@@ -15,6 +15,17 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the response from the XSTS (Xbox Secure Token Service).
+ *
+ * @property issueInstant The time at which the token was issued.
+ * @property notAfter The expiration time of the token.
+ * @property token The security token provided by the XSTS.
+ * @property displayClaims The display claims provided by the XSTS.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ */
 @Serializable
 public data class XstsResponse(
     @SerialName("IssueInstant")
