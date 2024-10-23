@@ -17,6 +17,12 @@ import dev.redtronics.mokt.network.defaultJson
 import io.ktor.client.*
 import kotlinx.serialization.json.Json
 
+/**
+ * Represents the Authentik provider.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public class Authentik : Provider {
     override val name: String
         get() = "Authentik"
