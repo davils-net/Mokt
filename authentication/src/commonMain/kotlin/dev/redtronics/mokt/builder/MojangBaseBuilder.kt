@@ -14,7 +14,7 @@ package dev.redtronics.mokt.builder
 import io.ktor.client.*
 import kotlinx.serialization.json.Json
 
-public abstract class BaseBuilder {
+public abstract class MojangBaseBuilder {
     internal abstract val httpClient: HttpClient
     internal abstract val json: Json
 }
