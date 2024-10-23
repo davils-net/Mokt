@@ -49,10 +49,6 @@ public class UserCodeBuilder internal constructor(
 
     public var setUserCodeAutomatically: Boolean = false
 
-    public var terminal: Terminal = Terminal()
-
-    public var printTerminal: (userCode: String) -> Unit = { userCode -> terminal.println(userCode) }
-
     public suspend fun displayUserCodeInBrowser() {
         codeServer = embeddedServer(CIO, localServerUrl.port, localServerUrl.host) {
             val path = localServerUrl.fullPath.ifBlank { "/" }
@@ -65,10 +61,6 @@ public class UserCodeBuilder internal constructor(
         }
 
         openInBrowser(deviceLoginEndpointUrl)
-    }
-
-    public fun displayUserCodeInTerminal() {
-
     }
 
     internal fun build(): CIOApplicationEngine? = codeServer
