@@ -80,8 +80,6 @@ public class DeviceBuilder internal constructor(override val provider: Microsoft
 
             if (displayMode == DisplayMode.BROWSER) {
                 displayUserCodeInBrowser()
-            } else {
-                displayUserCodeInTerminal()
             }
         }
     }
