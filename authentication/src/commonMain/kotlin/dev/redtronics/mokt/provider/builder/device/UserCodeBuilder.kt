@@ -13,7 +13,6 @@
 
 package dev.redtronics.mokt.provider.builder.device
 
-import com.github.ajalt.mordant.terminal.Terminal
 import dev.redtronics.mokt.openInBrowser
 import dev.redtronics.mokt.provider.html.WebTheme
 import dev.redtronics.mokt.provider.html.userCodePage
