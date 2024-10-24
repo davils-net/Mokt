@@ -103,7 +103,7 @@ public class DeviceBuilder internal constructor(override val provider: Microsoft
             this.shouldDisplayCode = shouldDisplayCode
 
             if (displayMode == DisplayMode.BROWSER) {
-                displayUserCodeInBrowser()
+                inBrowser()
             }
         }
     }
