@@ -13,6 +13,15 @@ package dev.redtronics.mokt.provider.response
 
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the OAuth Code from the auth endpoints.
+ *
+ * @property code The OAuth Code.
+ * @property state The state of the code as [Int].
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 @Serializable
 public data class OAuthCode(
     public val code: String,

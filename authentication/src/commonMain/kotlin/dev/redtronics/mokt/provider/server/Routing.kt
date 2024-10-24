@@ -55,6 +55,16 @@ internal fun Application.defaultGrantRouting(
     }
 }
 
+/**
+ * Module for routing the user code display page.
+ *
+ * @param userCode The user code to be displayed.
+ * @param displayPath The path to be routed to.
+ * @param userCodePage The page to be displayed.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ */
 internal fun Application.displayCodeRouting(
     userCode: String,
     displayPath: String,

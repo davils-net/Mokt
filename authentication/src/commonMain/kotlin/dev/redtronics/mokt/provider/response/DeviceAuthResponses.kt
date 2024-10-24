@@ -14,6 +14,19 @@ package dev.redtronics.mokt.provider.response
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the Device Code Response from the auth endpoints.
+ *
+ * @property deviceCode The Device Code.
+ * @property userCode The User Code.
+ * @property verificationUri The Verification URI.
+ * @property expiresIn The Expiration Time.
+ * @property interval The Interval to ping the verification URI.
+ * @property message The Message.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 @Serializable
 public data class DeviceCodeResponse(
     @SerialName("device_code")
