@@ -18,7 +18,11 @@ import dev.redtronics.mokt.MojangGameAuth
 import dev.redtronics.mokt.html.WebTheme
 import dev.redtronics.mokt.html.userCodePage
 import dev.redtronics.mokt.network.interval
-import dev.redtronics.mokt.response.*
+import dev.redtronics.mokt.response.AccessResponse
+import dev.redtronics.mokt.response.device.CodeErrorResponse
+import dev.redtronics.mokt.response.device.DeviceAuthStateError
+import dev.redtronics.mokt.response.device.DeviceAuthStateErrorItem
+import dev.redtronics.mokt.response.device.DeviceCodeResponse
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*

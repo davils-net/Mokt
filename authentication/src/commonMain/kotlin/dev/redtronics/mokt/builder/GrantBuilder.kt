@@ -19,8 +19,8 @@ import dev.redtronics.mokt.getEnv
 import dev.redtronics.mokt.html.failurePage
 import dev.redtronics.mokt.html.successPage
 import dev.redtronics.mokt.openInBrowser
-import dev.redtronics.mokt.response.CodeErrorResponse
 import dev.redtronics.mokt.response.OAuthCode
+import dev.redtronics.mokt.response.device.CodeErrorResponse
 import dev.redtronics.mokt.server.defaultGrantRouting
 import dev.redtronics.mokt.server.setup
 import io.ktor.http.*

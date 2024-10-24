@@ -11,9 +11,9 @@
 
 package dev.redtronics.mokt.server
 
-import dev.redtronics.mokt.response.CodeError
-import dev.redtronics.mokt.response.CodeErrorResponse
 import dev.redtronics.mokt.response.OAuthCode
+import dev.redtronics.mokt.response.device.CodeError
+import dev.redtronics.mokt.response.device.CodeErrorResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.html.*
