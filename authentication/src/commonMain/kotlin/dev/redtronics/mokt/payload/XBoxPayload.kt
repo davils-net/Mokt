@@ -11,7 +11,7 @@
 
 package dev.redtronics.mokt.payload
 
-import dev.redtronics.mokt.builder.TokenType
+import dev.redtronics.mokt.builder.mojang.TokenType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

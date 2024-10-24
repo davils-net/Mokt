@@ -9,14 +9,12 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt.provider.html
+package dev.redtronics.mokt.builder.mojang
 
-import kotlinx.html.HTML
+import io.ktor.client.*
+import kotlinx.serialization.json.Json
 
-public fun HTML.successPage() {
-
-}
-
-public fun HTML.failurePage() {
-
+public abstract class MojangBaseAuthBuilder {
+    internal abstract val httpClient: HttpClient
+    internal abstract val json: Json
 }

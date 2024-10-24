@@ -9,21 +9,14 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt.provider.response
+package dev.redtronics.mokt.html
 
-import kotlinx.serialization.Serializable
+import kotlinx.html.HTML
 
-/**
- * Represents the OAuth Code from the auth endpoints.
- *
- * @property code The OAuth Code.
- * @property state The state of the code as [Int].
- *
- * @since 0.0.1
- * @author Nils Jäkel
- * */
-@Serializable
-public data class OAuthCode(
-    public val code: String,
-    public val state: Int
-)
+public fun HTML.successPage() {
+
+}
+
+public fun HTML.failurePage() {
+
+}

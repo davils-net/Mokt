@@ -1,9 +1,8 @@
 /*
  * MIT License
- * Copyright 2024 Nils Jäkel & David Ernst
- *
+ * Copyright 2024 Nils Jäkel
  * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the “Software”),
+ * a copy of this software and associated documentation files (the "Software”),
  * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software.
@@ -11,12 +10,12 @@
 
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package dev.redtronics.mokt.provider.builder.device
+package dev.redtronics.mokt.builder.device
 
+import dev.redtronics.mokt.html.WebTheme
+import dev.redtronics.mokt.html.userCodePage
 import dev.redtronics.mokt.openInBrowser
-import dev.redtronics.mokt.provider.html.WebTheme
-import dev.redtronics.mokt.provider.html.userCodePage
-import dev.redtronics.mokt.provider.server.displayCodeRouting
+import dev.redtronics.mokt.server.displayCodeRouting
 import io.ktor.http.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*

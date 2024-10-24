@@ -9,13 +9,21 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt.provider.builder
+package dev.redtronics.mokt.response
 
-import dev.redtronics.mokt.MojangGameAuth
-import dev.redtronics.mokt.provider.Keycloak
+import kotlinx.serialization.Serializable
 
-public class KeycloakBuilder internal constructor(
-    override val provider: Keycloak
-) : MojangGameAuth<Keycloak>() {
-
-}
+/**
+ * Represents the OAuth Code from the auth endpoints.
+ *
+ * @property code The OAuth Code.
+ * @property state The state of the code as [Int].
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
+@Serializable
+public data class OAuthCode(
+    public val code: String,
+    public val state: Int
+)

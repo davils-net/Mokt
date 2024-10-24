@@ -1,9 +1,8 @@
 /*
  * MIT License
- * Copyright 2024 Nils Jäkel & David Ernst
- *
+ * Copyright 2024 Nils Jäkel
  * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the “Software”),
+ * a copy of this software and associated documentation files (the "Software”),
  * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software.
@@ -11,12 +10,12 @@
 
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package dev.redtronics.mokt.builder
+package dev.redtronics.mokt.builder.mojang
 
 import dev.redtronics.mokt.payload.XBoxPayload
 import dev.redtronics.mokt.payload.XBoxProperties
-import dev.redtronics.mokt.provider.response.AccessResponse
-import dev.redtronics.mokt.response.XBoxResponse
+import dev.redtronics.mokt.response.AccessResponse
+import dev.redtronics.mokt.response.mojang.XBoxResponse
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
