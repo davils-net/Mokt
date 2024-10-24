@@ -1,7 +1,7 @@
 package dev.redtronics
 
+import dev.redtronics.mokt.Microsoft
 import dev.redtronics.mokt.auth
-import dev.redtronics.mokt.provider.*
 import kotlinx.coroutines.supervisorScope
 
 suspend fun main(): Unit = supervisorScope {
