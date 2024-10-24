@@ -35,7 +35,7 @@ public class UserCodeBuilder internal constructor(
      * @since 0.0.1
      * @author Nils Jäkel
      */
-    public val deviceLoginEndpointUrl: Url
+    public val codeLoginEndpointUrl: Url
         get() = Url("https://www.microsoft.com/link")
 
     public var webPageTheme: WebTheme = WebTheme.DARK
@@ -58,8 +58,7 @@ public class UserCodeBuilder internal constructor(
         if (shouldDisplayCode) {
             openInBrowser(localServerUrl)
         }
-
-        openInBrowser(deviceLoginEndpointUrl)
+        openInBrowser(codeLoginEndpointUrl)
     }
 
     internal fun build(): CIOApplicationEngine? = codeServer
