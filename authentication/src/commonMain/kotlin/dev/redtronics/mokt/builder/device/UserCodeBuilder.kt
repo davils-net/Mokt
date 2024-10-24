@@ -46,7 +46,7 @@ public class UserCodeBuilder internal constructor(
 
     public var shouldDisplayCode: Boolean = true
 
-    public suspend fun displayUserCodeInBrowser() {
+    public suspend fun inBrowser() {
         codeServer = embeddedServer(CIO, localServerUrl.port, localServerUrl.host) {
             val path = localServerUrl.fullPath.ifBlank { "/" }
             displayCodeRouting(userCode, path, webPage)
