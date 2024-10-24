@@ -13,7 +13,15 @@ package dev.redtronics.mokt.html
 
 import kotlinx.html.*
 
-// TODO Resolve Urls from build constants
+/**
+ * Simple template page to display the user code.
+ *
+ * @param userCode The user code to be displayed.
+ * @param theme The theme to be used.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ */
 public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
     head {
         title("Device Code")
@@ -44,7 +52,7 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
                     padding: 0;
                     box-sizing: border-box;
                 }
-                
+
                 body {
                     background-image: url(https://code.redtronics.dev/nils.jaekel/mokt/-/raw/feat/grant-auth/assets/background.png);
                     background-position: center;
@@ -54,7 +62,7 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
                     align-items: center;
                     min-height: 100vh;
                 }
-                
+
                 .card {
                     display: flex;
                     width: 390px;
@@ -65,13 +73,13 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
                     padding: 20px;
                     background-color: ${if (theme == WebTheme.LIGHT) "#ffffff" else "#2d2d2d"};
                 }
-                
+
                 .card img {
                     width: 30%;
                     height: 30%;
                     margin-bottom: 34px;
                 }
-                
+
                 .code {
                     display: flex;
                     flex-direction: column;
@@ -80,7 +88,7 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
                     text-align: center;
                     color: ${if (theme == WebTheme.LIGHT) "#000000" else "#ffffff"}
                 }
-                
+
                 .credits {
                     position: absolute;
                     bottom: 50px;
@@ -92,6 +100,13 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
     }
 }
 
+/**
+ * Represents the theme of the user code page.
+ * Dark or Light Mode
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public enum class WebTheme {
     LIGHT,
     DARK;

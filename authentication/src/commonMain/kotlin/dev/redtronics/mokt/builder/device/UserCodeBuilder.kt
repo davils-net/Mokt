@@ -46,8 +46,6 @@ public class UserCodeBuilder internal constructor(
 
     public var shouldDisplayCode: Boolean = true
 
-    public var setUserCodeAutomatically: Boolean = false
-
     public suspend fun displayUserCodeInBrowser() {
         codeServer = embeddedServer(CIO, localServerUrl.port, localServerUrl.host) {
             val path = localServerUrl.fullPath.ifBlank { "/" }

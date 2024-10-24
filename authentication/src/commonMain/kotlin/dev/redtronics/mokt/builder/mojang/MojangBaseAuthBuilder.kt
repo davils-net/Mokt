@@ -14,6 +14,12 @@ package dev.redtronics.mokt.builder.mojang
 import io.ktor.client.*
 import kotlinx.serialization.json.Json
 
+/**
+ * Base class for all mojang authentication builders.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public abstract class MojangBaseAuthBuilder {
     internal abstract val httpClient: HttpClient
     internal abstract val json: Json

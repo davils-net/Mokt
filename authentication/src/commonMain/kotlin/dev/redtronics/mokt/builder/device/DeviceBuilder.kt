@@ -58,12 +58,34 @@ public class DeviceBuilder internal constructor(override val provider: Microsoft
     public val grantType: String
         get() = "urn:ietf:params:oauth:grant-type:device_code"
 
-
+    /**
+     * Configures the user code handling.
+     *
+     * @param userCode The user code to display.
+     * @param builder The builder to configure the output of the user code.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public suspend fun displayCode(userCode: String, builder: suspend UserCodeBuilder.() -> Unit) {
         val userCodeBuilder = UserCodeBuilder(userCode).apply { builder() }
         codeServer = userCodeBuilder.build()
     }
 
+    /**
+     * Configures the user code handling.
+     *
+     * @param userCode The user code to display.
+     * @param displayMode The display mode of the user code.
+     * @param localServerUrl The URL to the local server.
+     * @param webPageTheme The theme of the web page.
+     * @param forceHttps Whether to force HTTPS.
+     * @param shouldDisplayCode Whether to display the user code in the browser.
+     * @param webPage The web page to display the user code.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public suspend fun displayCode(
         userCode: String,
         displayMode: DisplayMode,
@@ -71,7 +93,6 @@ public class DeviceBuilder internal constructor(override val provider: Microsoft
         webPageTheme: WebTheme = WebTheme.DARK,
         forceHttps: Boolean = false,
         shouldDisplayCode: Boolean = true,
-        setUserCodeAutomatically: Boolean = false,
         webPage: HTML.(userCode: String) -> Unit = { code -> userCodePage(code, webPageTheme) }
     ) {
         displayCode(userCode) {
@@ -80,7 +101,6 @@ public class DeviceBuilder internal constructor(override val provider: Microsoft
             this.localServerUrl = localServerUrl
             this.forceHttps = forceHttps
             this.shouldDisplayCode = shouldDisplayCode
-            this.setUserCodeAutomatically = setUserCodeAutomatically
 
             if (displayMode == DisplayMode.BROWSER) {
                 displayUserCodeInBrowser()
