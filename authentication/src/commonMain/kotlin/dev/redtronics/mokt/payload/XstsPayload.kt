@@ -16,19 +16,19 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-public data class XstsPayload(
+internal data class XstsPayload(
     @SerialName("Properties")
-    public val properties: XstsProperties,
+    val properties: XstsProperties,
     @SerialName("RelyingParty")
-    public val relyingParty: String,
+    val relyingParty: String,
     @SerialName("TokenType")
-    public val tokenType: TokenType
+    val tokenType: TokenType
 )
 
 @Serializable
-public data class XstsProperties(
+internal data class XstsProperties(
     @SerialName("SandboxId")
-    public val sandboxId: String,
+    val sandboxId: String,
     @SerialName("UserTokens")
-    public val userTokens: List<String>
+    val userTokens: List<String>
 )

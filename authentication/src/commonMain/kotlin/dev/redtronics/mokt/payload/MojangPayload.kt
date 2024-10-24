@@ -14,6 +14,6 @@ package dev.redtronics.mokt.payload
 import kotlinx.serialization.Serializable
 
 @Serializable
-public data class MojangPayload(
-    public val identityToken: String
+internal data class MojangPayload(
+    val identityToken: String
 )

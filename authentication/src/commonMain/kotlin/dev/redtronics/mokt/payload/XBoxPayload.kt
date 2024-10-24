@@ -16,19 +16,19 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-public data class XBoxPayload(
+internal data class XBoxPayload(
     @SerialName("Properties")
-    public val properties: XBoxProperties,
-    public val relyingParty: String,
-    public val tokenType: TokenType
+    val properties: XBoxProperties,
+    val relyingParty: String,
+    val tokenType: TokenType
 )
 
 @Serializable
-public data class XBoxProperties(
+internal data class XBoxProperties(
     @SerialName("AuthMethod")
-    public val xAuthMethod: String,
+    val xAuthMethod: String,
     @SerialName("SiteName")
-    public val siteName: String,
+    val siteName: String,
     @SerialName("RpsTicket")
-    public val rpsTicket: String
+    val rpsTicket: String
 )
