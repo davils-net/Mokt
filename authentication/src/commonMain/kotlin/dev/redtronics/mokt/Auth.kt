@@ -1,6 +1,6 @@
 /*
  * MIT License
- * Copyright 2024 Nils Jäkel
+ * Copyright 2024 Nils Jäkel & David Ernst
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the “Software”),
@@ -13,18 +13,31 @@
 
 package dev.redtronics.mokt
 
-import dev.redtronics.mokt.builder.MojangBuilder
-import dev.redtronics.mokt.builder.XBoxBuilder
-import dev.redtronics.mokt.builder.XstsBuilder
-import dev.redtronics.mokt.provider.Authentik
-import dev.redtronics.mokt.provider.Keycloak
-import dev.redtronics.mokt.provider.Microsoft
-import dev.redtronics.mokt.provider.response.AccessResponse
-import dev.redtronics.mokt.response.MojangResponse
-import dev.redtronics.mokt.response.XBoxResponse
-import dev.redtronics.mokt.response.XstsResponse
+import dev.redtronics.mokt.builder.mojang.MojangBuilder
+import dev.redtronics.mokt.builder.mojang.XBoxBuilder
+import dev.redtronics.mokt.builder.mojang.XstsBuilder
+import dev.redtronics.mokt.response.AccessResponse
+import dev.redtronics.mokt.response.mojang.MojangResponse
+import dev.redtronics.mokt.response.mojang.XBoxResponse
+import dev.redtronics.mokt.response.mojang.XstsResponse
+import io.ktor.client.*
 import io.ktor.client.statement.*
+import kotlinx.serialization.json.Json
 import kotlin.reflect.KProperty
+
+/**
+ * Central adapter for the authentication providers.
+ *
+ * @property name The name of the provider.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ */
+public interface Provider {
+    public val name: String
+    public var httpClient: HttpClient
+    public var json: Json
+}
 
 /**
  * Provides a [AuthProvider] which can be used to access the selected provider and authenticate with them.
@@ -69,9 +82,7 @@ public suspend inline fun <reified T : Provider> auth(noinline builder: suspend 
     }
 
 public abstract class MojangGameAuth<out T : Provider> {
-    internal abstract val provider: T
-    public abstract fun accessToken(): AccessResponse?
-    internal abstract fun build()
+    public abstract val provider: T
 
     public suspend fun xBox(
         accessResponse: AccessResponse,

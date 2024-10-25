@@ -1,6 +1,6 @@
 /*
  * MIT License
- * Copyright 2024 Nils Jäkel
+ * Copyright 2024 Nils Jäkel & David Ernst
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the “Software”),
@@ -11,24 +11,24 @@
 
 package dev.redtronics.mokt.payload
 
-import dev.redtronics.mokt.builder.TokenType
+import dev.redtronics.mokt.builder.mojang.TokenType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-public data class XstsPayload(
+internal data class XstsPayload(
     @SerialName("Properties")
-    public val properties: XstsProperties,
+    val properties: XstsProperties,
     @SerialName("RelyingParty")
-    public val relyingParty: String,
+    val relyingParty: String,
     @SerialName("TokenType")
-    public val tokenType: TokenType
+    val tokenType: TokenType
 )
 
 @Serializable
-public data class XstsProperties(
+internal data class XstsProperties(
     @SerialName("SandboxId")
-    public val sandboxId: String,
+    val sandboxId: String,
     @SerialName("UserTokens")
-    public val userTokens: List<String>
+    val userTokens: List<String>
 )

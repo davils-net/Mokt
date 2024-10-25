@@ -1,6 +1,6 @@
 /*
  * MIT License
- * Copyright 2024 Nils Jäkel
+ * Copyright 2024 Nils Jäkel & David Ernst
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the “Software”),
@@ -23,6 +23,7 @@ kotlin {
         commonMain {
             dependencies {
                 api(project(":common"))
+                api(libs.mordant)
 
                 implementation(libs.ktor.server.core)
                 implementation(libs.ktor.server.cio)

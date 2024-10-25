@@ -1,6 +1,6 @@
 /*
  * MIT License
- * Copyright 2024 Nils Jäkel
+ * Copyright 2024 Nils Jäkel & David Ernst
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the “Software”),
@@ -14,6 +14,6 @@ package dev.redtronics.mokt.payload
 import kotlinx.serialization.Serializable
 
 @Serializable
-public data class MojangPayload(
-    public val identityToken: String
+internal data class MojangPayload(
+    val identityToken: String
 )
