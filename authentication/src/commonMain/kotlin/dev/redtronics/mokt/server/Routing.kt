@@ -49,8 +49,8 @@ internal fun Application.codeGrantRouting(
             }
 
             val oauthCode = GrantCodeResponse(queryParams["code"]!!, queryParams["state"]!!.toInt())
-            call.respondHtml(HttpStatusCode.OK, successPage)
             channel.send(oauthCode)
+            call.respondHtml(HttpStatusCode.OK, successPage)
         }
     }
 }
