@@ -32,12 +32,15 @@ internal fun Application.codeGrantRouting(
     channel: Channel<GrantCodeResponse>,
     successPage: HTML.() -> Unit,
     failurePage: HTML.() -> Unit,
-    onError: suspend (err: CodeErrorResponse) -> Unit
+    onError: suspend (err: CodeErrorResponse) -> Unit,
 ) {
     routing {
         get(redirectPath) {
-            val queryParams = call.request.queryParameters
-            if (queryParams["code"] == null || queryParams["state"] == null) {
+            val code = call.request.queryParameters["code"]
+            val state = call.request.queryParameters["state"]
+
+            if (code == null || state == null) {
+                val queryParams = call.request.queryParameters
                 val oauthErrorCode = CodeErrorResponse(
                     error = CodeError.byName(queryParams["error"]!!),
                     errorDescription = queryParams["error_description"]!!
@@ -48,9 +51,9 @@ internal fun Application.codeGrantRouting(
                 return@get
             }
 
-            val oauthCode = GrantCodeResponse(queryParams["code"]!!, queryParams["state"]!!.toInt())
-            channel.send(oauthCode)
             call.respondHtml(HttpStatusCode.OK, successPage)
+            channel.send(GrantCodeResponse(code, state.toInt()))
+            channel.close()
         }
     }
 }
@@ -68,7 +71,7 @@ internal fun Application.codeGrantRouting(
 internal fun Application.displayCodeRouting(
     userCode: String,
     displayPath: String,
-    userCodePage: HTML.(userCode: String) -> Unit
+    userCodePage: HTML.(userCode: String) -> Unit,
 ) {
     routing {
         get(displayPath) {
