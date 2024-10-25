@@ -108,7 +108,7 @@ public class Microsoft @PublishedApi internal constructor() : Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun <T> defaultGrant(builder: suspend GrantFlowBuilder.() -> T): T {
+    public suspend fun <T> codeGrant(builder: suspend GrantFlowBuilder.() -> T): T {
         authMethod = MSAuthMethod.OAUTH2
         GrantFlowBuilder(this).apply { return builder() }
     }

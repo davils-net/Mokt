@@ -19,8 +19,8 @@ import dev.redtronics.mokt.getEnv
 import dev.redtronics.mokt.html.failurePage
 import dev.redtronics.mokt.html.successPage
 import dev.redtronics.mokt.openInBrowser
-import dev.redtronics.mokt.response.OAuthCode
 import dev.redtronics.mokt.response.device.CodeErrorResponse
+import dev.redtronics.mokt.response.grant.GrantCodeResponse
 import dev.redtronics.mokt.server.defaultGrantRouting
 import dev.redtronics.mokt.server.setup
 import io.ktor.http.*
@@ -78,8 +78,8 @@ public class GrantFlowBuilder internal constructor(override val provider: Micros
     public suspend fun requestAuthorizationCode(
         browser: suspend (url: Url) -> Unit = { url -> openInBrowser(url) },
         onRequestError: suspend (err: CodeErrorResponse) -> Unit = {}
-    ): OAuthCode {
-        val authCodeChannel: Channel<OAuthCode> = Channel()
+    ): GrantCodeResponse {
+        val authCodeChannel: Channel<GrantCodeResponse> = Channel()
         val path = localRedirectUrl.fullPath.ifBlank { "/" }
 
         val authServer = embeddedServer(CIO, localRedirectUrl.port, localRedirectUrl.toString()) {

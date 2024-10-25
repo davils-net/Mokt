@@ -11,9 +11,9 @@
 
 package dev.redtronics.mokt.server
 
-import dev.redtronics.mokt.response.OAuthCode
 import dev.redtronics.mokt.response.device.CodeError
 import dev.redtronics.mokt.response.device.CodeErrorResponse
+import dev.redtronics.mokt.response.grant.GrantCodeResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.html.*
@@ -29,7 +29,7 @@ import kotlinx.html.HTML
  */
 internal fun Application.defaultGrantRouting(
     redirectPath: String,
-    channel: Channel<OAuthCode>,
+    channel: Channel<GrantCodeResponse>,
     successPage: HTML.() -> Unit,
     failurePage: HTML.() -> Unit,
     onError: suspend (err: CodeErrorResponse) -> Unit
@@ -48,7 +48,7 @@ internal fun Application.defaultGrantRouting(
                 return@get
             }
 
-            val oauthCode = OAuthCode(queryParams["code"]!!, queryParams["state"]!!.toInt())
+            val oauthCode = GrantCodeResponse(queryParams["code"]!!, queryParams["state"]!!.toInt())
             call.respondHtml(HttpStatusCode.OK, successPage)
             channel.send(oauthCode)
         }
