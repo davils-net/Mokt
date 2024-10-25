@@ -45,8 +45,9 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
         }
 
         style {
-            // language=CSS
-            +"""
+            unsafe {
+                // language=CSS
+                +"""
                 * {
                     margin: 0;
                     padding: 0;
@@ -96,6 +97,7 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
                     font-size: 15px;
                 }
             """.trimIndent()
+            }
         }
     }
 }
