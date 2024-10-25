@@ -25,5 +25,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 public data class GrantCodeResponse(
     public val code: String,
-    public val state: Int
+    public val state: String
 )

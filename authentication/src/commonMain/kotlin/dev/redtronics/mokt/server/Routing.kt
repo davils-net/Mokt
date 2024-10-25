@@ -51,8 +51,10 @@ internal fun Application.codeGrantRouting(
                 return@get
             }
 
+            val grantCodeResponse = GrantCodeResponse(code, state)
             call.respondHtml(HttpStatusCode.OK, successPage)
-            channel.send(GrantCodeResponse(code, state.toInt()))
+
+            channel.send(grantCodeResponse)
             channel.close()
         }
     }
