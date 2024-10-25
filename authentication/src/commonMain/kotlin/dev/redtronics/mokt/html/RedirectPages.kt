@@ -12,11 +12,17 @@
 package dev.redtronics.mokt.html
 
 import kotlinx.html.HTML
+import kotlinx.html.body
+import kotlinx.html.p
 
 public fun HTML.successPage() {
-
+    body {
+        p { text("Success!") }
+    }
 }
 
 public fun HTML.failurePage() {
-
+    body {
+        p { text("Failed!") }
+    }
 }
