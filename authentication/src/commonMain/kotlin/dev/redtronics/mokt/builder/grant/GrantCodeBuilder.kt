@@ -122,7 +122,7 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
 
     public suspend fun requestAccessToken(
         grantCode: GrantCodeResponse,
-        onRequestError: suspend (response: HttpResponse) -> Unit
+        onRequestError: suspend (response: HttpResponse) -> Unit = {}
     ): AccessResponse? {
         val response = provider.httpClient.submitForm(
             url = provider.tokenEndpointUrl.toString(),
