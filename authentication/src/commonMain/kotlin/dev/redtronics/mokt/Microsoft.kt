@@ -13,8 +13,8 @@
 
 package dev.redtronics.mokt
 
-import dev.redtronics.mokt.builder.GrantFlowBuilder
 import dev.redtronics.mokt.builder.device.DeviceBuilder
+import dev.redtronics.mokt.builder.grant.GrantCodeBuilder
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
 import io.ktor.client.*
@@ -76,7 +76,7 @@ public class Microsoft @PublishedApi internal constructor() : Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var scopes: List<MSScopes> = MSScopes.allScopes
+    public var scopes: List<MSScope> = MSScope.allScopes
 
     /**
      * The url of the token endpoint.
@@ -108,9 +108,9 @@ public class Microsoft @PublishedApi internal constructor() : Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun <T> codeGrant(builder: suspend GrantFlowBuilder.() -> T): T {
+    public suspend fun <T> codeGrant(builder: suspend GrantCodeBuilder.() -> T): T {
         authMethod = MSAuthMethod.OAUTH2
-        GrantFlowBuilder(this).apply { return builder() }
+        GrantCodeBuilder(this).apply { return builder() }
     }
 
     /**
@@ -200,7 +200,7 @@ public enum class MSTenant(public val value: String) {
  * @since 0.0.1
  * @author Nils Jäkel
  */
-public enum class MSScopes(public val value: String) {
+public enum class MSScope(public val value: String) {
     OPENID("openid"),
     PROFILE("profile"),
     EMAIL("email"),
@@ -219,9 +219,9 @@ public enum class MSScopes(public val value: String) {
          * @since 0.0.1
          * @author Nils Jäkel
          */
-        public fun byName(name: String): MSScopes = entries.first { it.value == name }
+        public fun byName(name: String): MSScope = entries.first { it.value == name }
 
-        public val allScopes: List<MSScopes>
+        public val allScopes: List<MSScope>
             get() = entries.toList()
     }
 }
