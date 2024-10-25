@@ -27,7 +27,7 @@ import kotlinx.html.HTML
  * @since 0.0.1
  * @author Nils Jäkel
  */
-internal fun Application.defaultGrantRouting(
+internal fun Application.codeGrantRouting(
     redirectPath: String,
     channel: Channel<GrantCodeResponse>,
     successPage: HTML.() -> Unit,
