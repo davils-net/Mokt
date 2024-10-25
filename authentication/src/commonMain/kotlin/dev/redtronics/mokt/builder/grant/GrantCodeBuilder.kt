@@ -114,14 +114,16 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
         }
 
         browser(Url(providerEndpointUrl))
-        println("test")
+
         val code = authCodeChannel.receive()
         authServer.stop()
-
         return code
     }
 
-    public suspend fun requestAccessToken(grantCode: GrantCodeResponse): AccessResponse? {
+    public suspend fun requestAccessToken(
+        grantCode: GrantCodeResponse,
+        onRequestError: suspend (response: HttpResponse) -> Unit
+    ): AccessResponse? {
         val response = provider.httpClient.submitForm(
             url = provider.tokenEndpointUrl.toString(),
             parameters {
@@ -132,8 +134,12 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
                 append("grant_type", grantType)
             }
         )
-        println(response.bodyAsText())
-        return null
+        if (!response.status.isSuccess()) {
+            onRequestError(response)
+            return null
+        }
+
+        return provider.json.decodeFromString(AccessResponse.serializer(), response.bodyAsText())
     }
 }
 
