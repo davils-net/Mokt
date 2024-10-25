@@ -71,7 +71,7 @@ kotlin {
                 api(libs.kotlinx.coroutines.reactive)
                 api(libs.ktor.client.cio)
 
-                implementation(libs.slf4j.api)
+                api(libs.slf4j.api)
             }
         }
 
