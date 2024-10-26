@@ -10,6 +10,7 @@ services:
       timeout: 5s
       start_period: 30s
     environment:
+      # All passwords and keys are test only. Don't use in production!!!
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: authentik
       POSTGRES_USER: postgres
@@ -58,6 +59,7 @@ services:
     ports:
       - "9000:9000"
     environment:
+      # All passwords and keys are test only. Don't use in production!!!
       AUTHENTIK_POSTGRESQL__USER: "postgres"
       AUTHENTIK_POSTGRESQL__NAME: "authentik"
       AUTHENTIK_POSTGRESQL__PASSWORD: "postgres"
@@ -79,6 +81,7 @@ services:
     restart: no
     command: worker
     environment:
+      # All passwords and keys are test only. Don't use in production!!!
       AUTHENTIK_POSTGRESQL__USER: "postgres"
       AUTHENTIK_POSTGRESQL__NAME: "authentik"
       AUTHENTIK_POSTGRESQL__PASSWORD: "postgres"
