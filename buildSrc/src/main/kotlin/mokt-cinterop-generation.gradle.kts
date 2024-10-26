@@ -9,43 +9,24 @@
  * and/or sell copies of the Software.
  */
 
-import org.jetbrains.gradle.ext.IdeaExtPlugin
-import org.jetbrains.gradle.ext.ProjectSettings
-import org.jetbrains.gradle.ext.TaskTriggersConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
     idea
-    eclipse
     org.jetbrains.gradle.plugin.`idea-ext`
 }
 
-if (!rootProject.pluginManager.hasPlugin("org.jetbrains.gradle.plugin.idea-ext")) {
-    rootProject.pluginManager.apply(IdeaExtPlugin::class)
-}
-
 tasks {
-    register("generateCInteropDefFiles") {
+    val task = register("generateCInteropDefFiles") {
         group = Project.NAME.lowercase()
         description = "Generates cinterop def files for all supported operating system platforms."
 
         project.compileRustBindings()
         project.generateCInteropDefFiles()
     }
+    onSyncExec(project, task.get(), rootProject.idea)
 
     withType<KotlinNativeCompile> {
         dependsOn("commonizeCInterop")
     }
 }
-
-rootProject.idea.project {
-    this as ExtensionAware
-    configure<ProjectSettings> {
-        this as ExtensionAware
-        configure<TaskTriggersConfig> {
-            afterSync(tasks["generateCInteropDefFiles"])
-        }
-    }
-}
-
-eclipse.synchronizationTasks("generateCInteropDefFiles")
