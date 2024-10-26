@@ -11,6 +11,7 @@
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.gradle.ext.IdeaExtPlugin
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -26,6 +27,10 @@ version = System.getenv(/* name = */ "CI_COMMIT_TAG") ?: System.getenv(/* name =
 
 repositories {
     mavenCentral()
+}
+
+if (!rootProject.pluginManager.hasPlugin("org.jetbrains.gradle.plugin.idea-ext")) {
+    rootProject.pluginManager.apply(IdeaExtPlugin::class)
 }
 
 val jvmTargetVersion = JvmTarget.JVM_1_8
