@@ -16,6 +16,7 @@ plugins {
     `mokt-multiplatform`
     `mokt-cinterop-generation`
     `mokt-android`
+    `mokt-build-constants`
 }
 
 repositories {

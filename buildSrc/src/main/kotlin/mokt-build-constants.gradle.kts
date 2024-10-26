@@ -10,5 +10,34 @@
  */
 
 plugins {
+    org.jetbrains.gradle.plugin.`idea-ext`
+    org.jetbrains.kotlin.multiplatform
+    idea
+}
 
+val buildConstants = extensions.create(
+    "buildConstants",
+    BuildConstantsConfiguration::class
+)
+
+kotlin {
+    tasks {
+        val name = rootProject.name
+        val task = register("generateBuildConstants") {
+            group = name
+            description = "Generates build constants for all plugins."
+
+            doLast {
+                generateBuildConstants(project, buildConstants)
+            }
+        }
+        generateOnCompile(project, task.get())
+        onSyncExec(project, task.get(), rootProject.idea)
+    }
+
+    sourceSets {
+        commonMain {
+            kotlin.srcDir(buildConstants.buildConstantDir(project))
+        }
+    }
 }

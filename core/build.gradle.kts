@@ -12,6 +12,7 @@
 plugins {
     `mokt-publishing`
     `mokt-multiplatform`
+    `mokt-build-constants`
 }
 
 group = Project.GROUP
