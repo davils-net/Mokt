@@ -14,7 +14,7 @@
 package dev.redtronics.mokt
 
 import dev.redtronics.mokt.builder.device.DeviceBuilder
-import dev.redtronics.mokt.builder.grant.GrantCodeBuilder
+import dev.redtronics.mokt.builder.GrantCodeBuilder
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
 import io.ktor.client.*

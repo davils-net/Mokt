@@ -15,7 +15,7 @@ package dev.redtronics.mokt.builder.device
 
 import dev.redtronics.mokt.html.WebTheme
 import dev.redtronics.mokt.html.userCodePage
-import dev.redtronics.mokt.openInBrowser
+import dev.redtronics.mokt.network.openInBrowser
 import dev.redtronics.mokt.server.displayCodeRouting
 import io.ktor.http.*
 import io.ktor.server.cio.*

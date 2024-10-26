@@ -1,9 +1,9 @@
 /*
  * MIT License
- * Copyright 2024 Nils Jäkel  & David Ernst
+ * Copyright 2024 Nils Jäkel & David Ernst
  *
  * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software”),
+ * a copy of this software and associated documentation files (the “Software”),
  * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software.
@@ -11,20 +11,20 @@
 
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package dev.redtronics.mokt.builder.grant
+package dev.redtronics.mokt.builder
 
 import dev.redtronics.mokt.Microsoft
 import dev.redtronics.mokt.MojangGameAuth
 import dev.redtronics.mokt.getEnv
 import dev.redtronics.mokt.html.failurePage
 import dev.redtronics.mokt.html.successPage
-import dev.redtronics.mokt.openInBrowser
+import dev.redtronics.mokt.network.openInBrowser
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.device.CodeErrorResponse
-import dev.redtronics.mokt.response.grant.GrantCodeResponse
+import dev.redtronics.mokt.response.GrantCodeResponse
 import dev.redtronics.mokt.server.codeGrantRouting
 import dev.redtronics.mokt.server.setup
-import dev.redtronics.mokt.utils.generateRandomIdentifier
+import dev.redtronics.mokt.generateRandomIdentifier
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*

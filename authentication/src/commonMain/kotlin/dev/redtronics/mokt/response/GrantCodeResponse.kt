@@ -9,7 +9,7 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt.response.grant
+package dev.redtronics.mokt.response
 
 import kotlinx.serialization.Serializable
 

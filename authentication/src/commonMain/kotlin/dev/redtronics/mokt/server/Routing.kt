@@ -13,7 +13,7 @@ package dev.redtronics.mokt.server
 
 import dev.redtronics.mokt.response.device.CodeError
 import dev.redtronics.mokt.response.device.CodeErrorResponse
-import dev.redtronics.mokt.response.grant.GrantCodeResponse
+import dev.redtronics.mokt.response.GrantCodeResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.html.*

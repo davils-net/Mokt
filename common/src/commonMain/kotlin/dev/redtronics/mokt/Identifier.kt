@@ -9,7 +9,7 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt.utils
+package dev.redtronics.mokt
 
 import kotlin.random.Random
 
