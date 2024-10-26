@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 public class FlowBuilder<T : FlowData, R : FlowProgress> internal constructor(maxParallelism: Int) {
     private val dispatcher = Dispatchers.Default.limitedParallelism(maxParallelism)
     private val steps = mutableListOf<FlowStep<T, R>>()
+    private val parallelProgressList = atomic(mutableListOf<Int>())
 
     public fun step(flowStep: FlowStep<T, R>): FlowStep<T, R> = flowStep.also { steps.add(it) }
 
@@ -40,13 +41,13 @@ public class FlowBuilder<T : FlowData, R : FlowProgress> internal constructor(ma
     public fun parallelStep(vararg flowSteps: FlowStep<T, R>): FlowStep<T, R> {
         val step = object : FlowStep<T, R> {
             override suspend fun execute(flowData: T): Flow<R> = channelFlow {
-                val progressList = atomic(mutableListOf<Int>())
 
                 val stepJobs = flowSteps.map { flowStep ->
                     CoroutineScope(dispatcher).launch {
                         flowStep.execute(flowData).collect {
-                            progressList.value.add(it.progress)
-                            val progress = progressList.value.sumOf { num -> num } / flowSteps.size
+                            parallelProgressList.value.add(it.progress)
+                            val progress = parallelProgressList.value.sumOf { num -> num } / flowSteps.size
+
                             it.incrementParallelProgress(progress)
                             send(it)
                         }

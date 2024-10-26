@@ -32,7 +32,7 @@ public abstract class FlowProgress {
     public abstract val totalSteps: Int
     public var stepProgress: Double? = null
 
-    private var parallelProgress = atomic(0)
+    private val parallelProgress = atomic(0)
 
     public val progress: Int
         get() {
