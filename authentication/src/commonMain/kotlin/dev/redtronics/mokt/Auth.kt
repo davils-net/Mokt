@@ -23,7 +23,6 @@ import dev.redtronics.mokt.response.mojang.XstsResponse
 import io.ktor.client.*
 import io.ktor.client.statement.*
 import kotlinx.serialization.json.Json
-import kotlin.reflect.KProperty
 
 /**
  * Central adapter for the authentication providers.
@@ -39,55 +38,13 @@ public interface Provider {
     public var json: Json
 }
 
-/**
- * Provides a [AuthProvider] which can be used to access the selected provider and authenticate with them.
- *
- * @since 0.0.1
- * @author Nils Jäkel
- */
-public class AuthProvider<in T : Provider> @PublishedApi internal constructor(private val provider: T) {
-    public val value: @UnsafeVariance T
-        get() = provider
-
-    public operator fun getValue(t: T?, property: KProperty<*>): @UnsafeVariance T {
-        return provider
-    }
-}
-
-/**
- * Provides a [AuthProvider] which can be used to access the selected provider and authenticate with them.
- *
- * @param T The provider that should be used.
- * @param builder The builder to configure the provider.
- * @return [AuthProvider] with the selected provider.
- *
- * @since 0.0.1
- * @author Nils Jäkel
- */
-public suspend inline fun <reified T : Provider> auth(noinline builder: suspend T.() -> Unit): AuthProvider<T> =
-    when (T::class) {
-        Microsoft::class -> {
-            val microsoft = Microsoft().apply { builder(this as T) }
-            if (microsoft.clientId == null) throw IllegalArgumentException("Client id is not set")
-
-            require(Regex("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}").matches(microsoft.clientId!!)) { "Client id is not valid" }
-            AuthProvider(microsoft)
-        }
-
-        Authentik::class -> AuthProvider(Authentik().apply { builder(this as T) })
-        Keycloak::class -> AuthProvider(Keycloak().apply { builder(this as T) })
-        else -> {
-            throw IllegalArgumentException("Provider ${T::class} is not supported")
-        }
-    }
-
 public abstract class MojangGameAuth<out T : Provider> {
     public abstract val provider: T
 
     public suspend fun xBox(
         accessResponse: AccessResponse,
         onRequestError: suspend (response: HttpResponse) -> Unit = {},
-        builder: suspend XBoxBuilder.() -> Unit = {}
+        builder: suspend XBoxBuilder.() -> Unit = {},
     ): XBoxResponse? {
         val xBoxBuilder = XBoxBuilder(provider.httpClient, provider.json, accessResponse).apply { builder() }
         return xBoxBuilder.build(onRequestError)
@@ -96,7 +53,7 @@ public abstract class MojangGameAuth<out T : Provider> {
     public suspend fun xsts(
         xBoxResponse: XBoxResponse,
         onRequestError: suspend (response: HttpResponse) -> Unit = {},
-        builder: suspend XstsBuilder.() -> Unit
+        builder: suspend XstsBuilder.() -> Unit,
     ): XstsResponse? {
         val xstsBuilder = XstsBuilder(provider.httpClient, provider.json, xBoxResponse).apply { builder() }
         return xstsBuilder.build(onRequestError)
@@ -105,7 +62,7 @@ public abstract class MojangGameAuth<out T : Provider> {
     public suspend fun xsts(
         xBoxResponse: XBoxResponse,
         onRequestError: suspend (response: HttpResponse) -> Unit = {},
-        relyingParty: String = "rp://api.minecraftservices.com/"
+        relyingParty: String = "rp://api.minecraftservices.com/",
     ): XstsResponse? {
         val xsts = xsts(xBoxResponse, onRequestError) {
             this.relyingParty = relyingParty
@@ -116,9 +73,22 @@ public abstract class MojangGameAuth<out T : Provider> {
     public suspend fun mojang(
         xstsResponse: XstsResponse,
         onRequestError: suspend (response: HttpResponse) -> Unit = {},
-        builder: suspend MojangBuilder.() -> Unit = {}
+        builder: suspend MojangBuilder.() -> Unit = {},
     ): MojangResponse? {
         val mojangBuilder = MojangBuilder(provider.httpClient, provider.json, xstsResponse).apply { builder() }
         return mojangBuilder.build(onRequestError)
     }
+}
+
+public suspend fun microsoftAuth(builder: suspend Microsoft.() -> Unit): Microsoft {
+    val microsoft = Microsoft().apply { builder() }
+    if (microsoft.clientId == null) throw IllegalArgumentException("Client id is not set")
+
+    require(Regex("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}").matches(microsoft.clientId!!)) { "Client id is not valid" }
+    return microsoft
+}
+
+public suspend fun keycloakAuth(builder: suspend Keycloak.() -> Unit): Keycloak {
+    val keycloak = Keycloak().apply { builder() }
+    return keycloak
 }
