@@ -14,15 +14,18 @@ package dev.redtronics.mokt
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
 import io.ktor.client.*
+import io.ktor.http.*
 import kotlinx.serialization.json.Json
 
 public class Keycloak internal constructor() : Provider {
     override val name: String
         get() = "Keycloak"
-
     override var httpClient: HttpClient = client
-
     override var json: Json = defaultJson
+
+    public var clientId: String? = null
+    public var instanceUrl: Url? = null
+    public var realm: String? = null
 
     public suspend fun device() {
 
