@@ -18,7 +18,6 @@ import dev.redtronics.mokt.builder.mojang.XBoxBuilder
 import dev.redtronics.mokt.builder.mojang.XstsBuilder
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
-import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.mojang.MojangResponse
 import dev.redtronics.mokt.response.mojang.XBoxResponse
 import dev.redtronics.mokt.response.mojang.XstsResponse
