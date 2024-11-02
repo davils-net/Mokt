@@ -15,7 +15,6 @@ package dev.redtronics.mokt.builder.mojang
 
 import dev.redtronics.mokt.payload.XBoxPayload
 import dev.redtronics.mokt.payload.XBoxProperties
-import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.mojang.XBoxResponse
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -33,7 +32,7 @@ import kotlinx.serialization.json.Json
 public class XBoxBuilder internal constructor(
     override val httpClient: HttpClient,
     override val json: Json,
-    private val accessResponse: AccessResponse
+    private val accessToken: String
 ) : MojangBaseAuthBuilder() {
     public val relyingPartyUrl: Url
         get() = Url("http://auth.xboxlive.com")
@@ -47,7 +46,7 @@ public class XBoxBuilder internal constructor(
         get() = "RPS"
 
     public val rpsTicket: String
-        get() = "d=${accessResponse.accessToken}"
+        get() = "d=${accessToken}"
 
     internal suspend fun build(onRequestError: suspend (response: HttpResponse) -> Unit): XBoxResponse? {
         val payload = XBoxPayload(
