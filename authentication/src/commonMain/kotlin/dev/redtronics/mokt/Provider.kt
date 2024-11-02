@@ -86,3 +86,18 @@ public suspend fun mojangAuth(builder: suspend Mojang.() -> Unit): Mojang {
     val mojang = Mojang().apply { builder() }
     return mojang
 }
+
+/**
+ * Central adapter to communicate with the Keycloak authentication provider.
+ * It creates an instance of [Keycloak] and configures it with the provided builder.
+ *
+ * @param builder The builder to configure the [Keycloak] instance.
+ * @return The initialized and configured [Keycloak] instance.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
+public suspend fun keycloakAuth(builder: suspend Keycloak.() -> Unit): Keycloak {
+    val keycloak = Keycloak().apply { builder() }
+    return keycloak
+}
