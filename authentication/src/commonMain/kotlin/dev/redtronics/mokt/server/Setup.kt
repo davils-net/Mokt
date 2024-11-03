@@ -17,7 +17,7 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
 
 /**
- * Sets up the server with their default settings.
+ * Configures and installs the necessary components for the authentication server.
  *
  * @since 0.0.1
  * @author Nils Jäkel
