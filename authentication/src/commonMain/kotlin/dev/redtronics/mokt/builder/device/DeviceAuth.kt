@@ -33,7 +33,7 @@ public abstract class DeviceAuth<out T : Provider> : MojangGameAuth<T>() {
 
     public abstract val deviceCodeEndpointUrl: Url
 
-    public var grantType: String = "urn:ietf:params:oauth:grant-type:device_code"
+    public abstract var grantType: String
 
     public suspend fun displayCode(userCode: String, builder: suspend UserCodeBuilder.() -> Unit) {
         val userCodeBuilder = UserCodeBuilder(userCode).apply { builder() }
