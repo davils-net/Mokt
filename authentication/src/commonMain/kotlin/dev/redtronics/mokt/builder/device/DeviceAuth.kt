@@ -35,8 +35,8 @@ public abstract class DeviceAuth<out T : Provider> : MojangGameAuth<T>() {
 
     public abstract var grantType: String
 
-    public suspend fun displayCode(userCode: String, builder: suspend UserCodeBuilder.() -> Unit) {
-        val userCodeBuilder = UserCodeBuilder(userCode).apply { builder() }
+    public suspend fun displayCode(deviceCodeResponse: DeviceCodeResponse, builder: suspend UserCodeBuilder.() -> Unit) {
+        val userCodeBuilder = UserCodeBuilder(deviceCodeResponse).apply { builder() }
         codeServer = userCodeBuilder.build()
     }
 
@@ -68,6 +68,16 @@ public abstract class DeviceAuth<out T : Provider> : MojangGameAuth<T>() {
     ): AccessResponse? {
         val startTime = getTimeMillis()
         return authLoop(startTime, deviceCodeResponse, additionalParameters, onRequestError)
+    }
+
+    public suspend fun requestAccessToken(
+        deviceCodeResponse: DeviceCodeResponse,
+        additionalParameters: Map<String, String> = mapOf(),
+        displayUserCode: suspend UserCodeBuilder.() -> Unit = {},
+        onRequestError: suspend (err: DeviceAuthStateError) -> Unit = {},
+    ): AccessResponse? {
+        displayCode(deviceCodeResponse, displayUserCode)
+        return requestAccessToken(deviceCodeResponse, additionalParameters, onRequestError)
     }
 
     internal suspend fun authLoop(
