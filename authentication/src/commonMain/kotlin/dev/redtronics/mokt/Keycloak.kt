@@ -21,18 +21,21 @@ import kotlinx.serialization.json.Json
 public class Keycloak internal constructor() : Provider {
     override val name: String
         get() = "Keycloak"
+
     override var httpClient: HttpClient = client
+
     override var json: Json = defaultJson
 
-    public var clientId: String? = null
+    override var clientId: String? = getEnv("KEYCLOAK_CLIENT_ID")
+
+    override val tokenEndpointUrl: Url
+        get() = TODO("Not yet implemented")
+
     public var instanceUrl: Url? = null
+
     public var realm: String? = null
 
     public suspend fun device(builder: suspend KeycloakDeviceBuilder.() -> Unit) {
         KeycloakDeviceBuilder(this).apply { builder() }
-    }
-
-    public suspend fun codeGrant() {
-
     }
 }
