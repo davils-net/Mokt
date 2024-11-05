@@ -54,6 +54,8 @@ public abstract class Provider {
 
     public abstract var clientId: String?
 
+    public abstract var clientSecret: String?
+
     public var scopes: List<Scope> = Scope.allScopes
 
     internal abstract suspend fun build()

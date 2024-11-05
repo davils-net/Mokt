@@ -82,6 +82,8 @@ public class Microsoft internal constructor() : Provider() {
     override val tokenEndpointUrl: Url
         get() = Url("https://login.microsoftonline.com/${tenant.value}/oauth2/v2.0/token")
 
+    override var clientSecret: String? = getEnv("KEYCLOAK_CLIENT_SECRET")
+
     /**
      * Detects which authentication method is used.
      * If no authentication method used, the auth method will be set to null.

@@ -29,12 +29,15 @@ public class Keycloak internal constructor() : Provider() {
 
     override var clientId: String? = getEnv("KEYCLOAK_CLIENT_ID")
 
+    override var clientSecret: String? = getEnv("KEYCLOAK_CLIENT_SECRET")
+
     public var instanceUrl: Url? = null
+
+    public var realm: String? = null
 
     override val tokenEndpointUrl: Url
         get() = instanceUrl!! / "/realms/$realm/protocol/openid-connect/token"
 
-    public var realm: String? = null
 
     public suspend fun <T> device(builder: suspend KeycloakDeviceBuilder.() -> T): T {
         val keycloakBuilder = KeycloakDeviceBuilder(this)

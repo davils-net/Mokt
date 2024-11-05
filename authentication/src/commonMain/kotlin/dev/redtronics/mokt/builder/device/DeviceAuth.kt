@@ -15,7 +15,6 @@ package dev.redtronics.mokt.builder.device
 
 import dev.redtronics.mokt.MojangGameAuth
 import dev.redtronics.mokt.Provider
-import dev.redtronics.mokt.getEnv
 import dev.redtronics.mokt.network.interval
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.device.CodeErrorResponse
@@ -36,8 +35,6 @@ public abstract class DeviceAuth<out T : Provider> : MojangGameAuth<T>() {
 
     public abstract var grantType: String
 
-    public var clientSecret: String? = getEnv("KEYCLOAK_CLIENT_SECRET")
-
     public suspend fun displayCode(deviceCodeResponse: DeviceCodeResponse, builder: suspend UserCodeBuilder.() -> Unit) {
         val userCodeBuilder = UserCodeBuilder(deviceCodeResponse).apply { builder() }
         codeServer = userCodeBuilder.build()
@@ -53,8 +50,8 @@ public abstract class DeviceAuth<out T : Provider> : MojangGameAuth<T>() {
                 append("client_id", provider.clientId!!)
                 append("scope", provider.scopes.joinToString(" ") { it.value })
 
-                if (clientSecret != null) {
-                    append("client_secret", clientSecret!!)
+                if (provider.clientSecret != null) {
+                    append("client_secret", provider.clientSecret!!)
                 }
 
                 additionalParameters.forEach {
@@ -103,6 +100,11 @@ public abstract class DeviceAuth<out T : Provider> : MojangGameAuth<T>() {
                 append("client_id", provider.clientId!!)
                 append("device_code", deviceCodeResponse.deviceCode)
                 append("grant_type", grantType)
+
+                if (provider.clientSecret != null) {
+                    append("client_secret", provider.clientSecret!!)
+                }
+
                 additionalParameters.forEach {
                     append(it.key, it.value)
                 }
