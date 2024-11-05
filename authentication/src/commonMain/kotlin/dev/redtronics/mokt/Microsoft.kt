@@ -13,8 +13,9 @@
 
 package dev.redtronics.mokt
 
-import dev.redtronics.mokt.builder.device.DeviceBuilder
+import dev.redtronics.mokt.Tenant.*
 import dev.redtronics.mokt.builder.GrantCodeBuilder
+import dev.redtronics.mokt.builder.device.MicrosoftDeviceBuilder
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
 import io.ktor.client.*
@@ -28,7 +29,7 @@ import kotlinx.serialization.json.Json
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public class Microsoft internal constructor() : Provider {
+public class Microsoft internal constructor() : Provider() {
     override val name: String
         get() = "Microsoft"
 
@@ -58,7 +59,7 @@ public class Microsoft internal constructor() : Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var clientId: String? = getEnv("MS_CLIENT_ID")
+    override var clientId: String? = getEnv("MS_CLIENT_ID")
 
     /**
      * The [Tenant] value in the path of the request URL can be used to control
@@ -70,15 +71,7 @@ public class Microsoft internal constructor() : Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var tenant: Tenant = Tenant.CONSUMERS
-
-    /**
-     * Scopes are used to specify which resources or permissions your application is requesting access to.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public var scopes: List<Scope> = Scope.allScopes
+    public var tenant: Tenant = CONSUMERS
 
     /**
      * The url of the microsoft token endpoint.
@@ -86,7 +79,7 @@ public class Microsoft internal constructor() : Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public val tokenEndpointUrl: Url
+    override val tokenEndpointUrl: Url
         get() = Url("https://login.microsoftonline.com/${tenant.value}/oauth2/v2.0/token")
 
     /**
@@ -121,7 +114,9 @@ public class Microsoft internal constructor() : Provider {
      * */
     public suspend fun <T> codeGrant(builder: suspend GrantCodeBuilder.() -> T): T {
         authMethod = AuthMethod.GRANT_CODE
-        GrantCodeBuilder(this).apply { return builder() }
+
+        val grantCodeBuilder = GrantCodeBuilder(this)
+        return builder(grantCodeBuilder).apply { build() }
     }
 
     /**
@@ -144,9 +139,17 @@ public class Microsoft internal constructor() : Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun <T> device(builder: suspend DeviceBuilder.() -> T): T {
+    public suspend fun <T> device(builder: suspend MicrosoftDeviceBuilder.() -> T): T {
         authMethod = AuthMethod.DEVICE_AUTH
-        DeviceBuilder(this).apply { return builder() }
+
+        val deviceBuilder = MicrosoftDeviceBuilder(this)
+        return builder(deviceBuilder).apply { build() }
+    }
+
+    override suspend fun build() {
+        require(clientId != null) { "Client id is not set" }
+        val isClientIdValid = Regex("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}").matches(clientId!!)
+        if (!isClientIdValid) throw IllegalArgumentException("Client id is not valid")
     }
 }
 
@@ -163,30 +166,4 @@ public enum class Tenant(public val value: String) {
     CONSUMERS("consumers"),
     ORGANIZATIONS("organizations"),
     COMMON("common");
-}
-
-/**
- * The [Scope] in the request path can be set to specify which resources or permissions your
- * application is requesting access to.
- *
- * @since 0.0.1
- * @author Nils Jäkel
- */
-public enum class Scope(public val value: String) {
-    OPENID("openid"),
-    PROFILE("profile"),
-    EMAIL("email"),
-    OFFLINE_ACCESS("offline_access"),
-    XBOX_LIVE_SIGNIN("XBoxLive.signin");
-
-    public companion object {
-        /**
-         * A list of all available scopes.
-         *
-         * @since 0.0.1
-         * @author Nils Jäkel
-         * */
-        public val allScopes: List<Scope>
-            get() = entries.toList()
-    }
 }
