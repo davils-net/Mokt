@@ -13,8 +13,9 @@
 
 package dev.redtronics.mokt
 
-import dev.redtronics.mokt.builder.device.DeviceBuilder
+import dev.redtronics.mokt.Tenant.*
 import dev.redtronics.mokt.builder.GrantCodeBuilder
+import dev.redtronics.mokt.builder.device.MsDeviceBuilder
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
 import io.ktor.client.*
@@ -144,9 +145,9 @@ public class Microsoft internal constructor() : Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun <T> device(builder: suspend DeviceBuilder.() -> T): T {
+    public suspend fun <T> device(builder: suspend MsDeviceBuilder.() -> T): T {
         authMethod = AuthMethod.DEVICE_AUTH
-        DeviceBuilder(this).apply { return builder() }
+        MsDeviceBuilder(this).apply { return builder() }
     }
 }
 

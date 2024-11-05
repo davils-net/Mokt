@@ -14,9 +14,6 @@
 package dev.redtronics.mokt.builder.device
 
 import dev.redtronics.mokt.Microsoft
-import dev.redtronics.mokt.MojangGameAuth
-import dev.redtronics.mokt.html.WebTheme
-import dev.redtronics.mokt.html.userCodePage
 import dev.redtronics.mokt.network.interval
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.device.CodeErrorResponse
@@ -26,9 +23,7 @@ import dev.redtronics.mokt.response.device.DeviceCodeResponse
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.server.cio.*
 import io.ktor.util.date.*
-import kotlinx.html.HTML
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -37,16 +32,14 @@ import kotlin.time.Duration.Companion.seconds
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public class DeviceBuilder internal constructor(override val provider: Microsoft) : MojangGameAuth<Microsoft>() {
-    private var codeServer: CIOApplicationEngine? = null
-
+public class MsDeviceBuilder internal constructor(override val provider: Microsoft) : DeviceAuth<Microsoft>() {
     /**
      * The URL to the Microsoft Device Code endpoint.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      */
-    public val deviceCodeEndpointUrl: Url
+    override val deviceCodeEndpointUrl: Url
         get() = Url("https://login.microsoftonline.com/${provider.tenant.value}/oauth2/v2.0/devicecode")
 
     /**
@@ -55,58 +48,8 @@ public class DeviceBuilder internal constructor(override val provider: Microsoft
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public val grantType: String
+    override val grantType: String
         get() = "urn:ietf:params:oauth:grant-type:device_code"
-
-    /**
-     * Configures the user code handling.
-     *
-     * @param userCode The user code to display.
-     * @param builder The builder to configure the output of the user code.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public suspend fun displayCode(userCode: String, builder: suspend UserCodeBuilder.() -> Unit) {
-        val userCodeBuilder = UserCodeBuilder(userCode).apply { builder() }
-        codeServer = userCodeBuilder.build()
-    }
-
-    /**
-     * Configures the user code handling.
-     *
-     * @param userCode The user code to display.
-     * @param displayMode The display mode of the user code.
-     * @param localServerUrl The URL to the local server.
-     * @param webPageTheme The theme of the web page.
-     * @param forceHttps Whether to force HTTPS.
-     * @param shouldDisplayCode Whether to display the user code in the browser.
-     * @param webPage The web page to display the user code.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public suspend fun displayCode(
-        userCode: String,
-        displayMode: DisplayMode,
-        localServerUrl: Url = Url("http://localhost:18769/usercode"),
-        webPageTheme: WebTheme = WebTheme.DARK,
-        forceHttps: Boolean = false,
-        shouldDisplayCode: Boolean = true,
-        webPage: HTML.(userCode: String) -> Unit = { code -> userCodePage(code, webPageTheme) }
-    ) {
-        displayCode(userCode) {
-            this.webPageTheme = webPageTheme
-            this.webPage = webPage
-            this.localServerUrl = localServerUrl
-            this.forceHttps = forceHttps
-            this.shouldDisplayCode = shouldDisplayCode
-
-            if (displayMode == DisplayMode.BROWSER) {
-                inBrowser()
-            }
-        }
-    }
 
     /**
      * Requests an authorization code from the Microsoft Device Code endpoint.
@@ -117,8 +60,9 @@ public class DeviceBuilder internal constructor(override val provider: Microsoft
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun requestAuthorizationCode(
-        onRequestError: suspend (err: CodeErrorResponse) -> Unit = {},
+    override suspend fun requestAuthorizationCode(
+        onRequestError: suspend (err: CodeErrorResponse) -> Unit,
+
     ): DeviceCodeResponse? {
         val response = provider.httpClient.submitForm(
             url = deviceCodeEndpointUrl.toString(),
@@ -144,9 +88,9 @@ public class DeviceBuilder internal constructor(override val provider: Microsoft
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun requestAccessToken(
+    override suspend fun requestAccessToken(
         deviceCodeResponse: DeviceCodeResponse,
-        onRequestError: suspend (err: DeviceAuthStateError) -> Unit = {}
+        onRequestError: suspend (err: DeviceAuthStateError) -> Unit
     ): AccessResponse? {
         val startTime = getTimeMillis()
         return authLoop(startTime, deviceCodeResponse, onRequestError)
@@ -163,11 +107,11 @@ public class DeviceBuilder internal constructor(override val provider: Microsoft
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    private suspend fun authLoop(
+    override suspend fun authLoop(
         startTime: Long,
         deviceCodeResponse: DeviceCodeResponse,
         onRequestError: suspend (err: DeviceAuthStateError) -> Unit
-    ) = interval(
+    ): AccessResponse? = interval(
         interval = deviceCodeResponse.interval.seconds,
         cond = { getTimeMillis() - startTime < deviceCodeResponse.expiresIn * 1000 }
     ) {
