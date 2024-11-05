@@ -11,6 +11,7 @@
 
 package dev.redtronics.mokt
 
+import dev.redtronics.mokt.builder.device.KeycloakDeviceBuilder
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
 import io.ktor.client.*
@@ -27,8 +28,8 @@ public class Keycloak internal constructor() : Provider {
     public var instanceUrl: Url? = null
     public var realm: String? = null
 
-    public suspend fun device() {
-
+    public suspend fun device(builder: suspend KeycloakDeviceBuilder.() -> Unit) {
+        KeycloakDeviceBuilder(this).apply { builder() }
     }
 
     public suspend fun codeGrant() {
