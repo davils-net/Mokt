@@ -16,14 +16,10 @@ package dev.redtronics.mokt
 import dev.redtronics.mokt.builder.mojang.MojangBuilder
 import dev.redtronics.mokt.builder.mojang.XBoxBuilder
 import dev.redtronics.mokt.builder.mojang.XstsBuilder
-import dev.redtronics.mokt.network.client
-import dev.redtronics.mokt.network.defaultJson
 import dev.redtronics.mokt.response.mojang.MojangResponse
 import dev.redtronics.mokt.response.mojang.XBoxResponse
 import dev.redtronics.mokt.response.mojang.XstsResponse
-import io.ktor.client.*
 import io.ktor.client.statement.*
-import kotlinx.serialization.json.Json
 
 /**
  * Mojang authentication provider.
@@ -33,14 +29,14 @@ import kotlinx.serialization.json.Json
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public class Mojang internal constructor() : Provider, MojangGameAuth<Mojang>() {
-    override val name: String
-        get() = "Mojang"
-
-    override var httpClient: HttpClient = client
-    override var json: Json = defaultJson
-    override val provider: Mojang = this
-}
+//public class Mojang internal constructor() : Provider, MojangGameAuth<Mojang>() {
+//    override val name: String
+//        get() = "Mojang"
+//
+//    override var httpClient: HttpClient = client
+//    override var json: Json = defaultJson
+//    override val provider: Mojang = this
+//}
 
 /**
  * Implements the complete mojang authentication to the provider, that is inherited from [MojangGameAuth].
@@ -55,7 +51,7 @@ public abstract class MojangGameAuth<out T : Provider> {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public abstract val provider: T
+    internal abstract val provider: T
 
     /**
      * Interacts with the XBox endpoint to get the XBox access token and their response.
