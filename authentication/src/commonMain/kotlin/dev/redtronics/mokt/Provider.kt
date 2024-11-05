@@ -13,6 +13,8 @@
 
 package dev.redtronics.mokt
 
+import dev.redtronics.mokt.network.client
+import dev.redtronics.mokt.network.defaultJson
 import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
@@ -23,14 +25,14 @@ import kotlinx.serialization.json.Json
  * @since 0.0.1
  * @author Nils Jäkel
  */
-public interface Provider {
+public abstract class Provider {
     /**
      * The name of the authentication provider.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public val name: String
+    public abstract val name: String
 
     /**
      * The http client used by the authentication provider.
@@ -38,7 +40,7 @@ public interface Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var httpClient: HttpClient
+    public abstract var httpClient: HttpClient
 
     /**
      * The json serializer used by the authentication provider.
@@ -46,11 +48,15 @@ public interface Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var json: Json
+    public abstract var json: Json
 
-    public val tokenEndpointUrl: Url
+    public abstract val tokenEndpointUrl: Url
 
-    public var clientId: String?
+    public abstract var clientId: String?
+
+    public var scopes: List<Scope> = Scope.allScopes
+
+    internal abstract suspend fun build()
 }
 
 /**
@@ -65,9 +71,6 @@ public interface Provider {
  */
 public suspend fun microsoftAuth(builder: suspend Microsoft.() -> Unit): Microsoft {
     val microsoft = Microsoft().apply { builder() }
-    if (microsoft.clientId == null) throw IllegalArgumentException("Client id is not set")
-
-    require(Regex("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}").matches(microsoft.clientId!!)) { "Client id is not valid" }
     return microsoft
 }
 
@@ -105,4 +108,18 @@ public suspend fun microsoftAuth(builder: suspend Microsoft.() -> Unit): Microso
 public suspend fun keycloakAuth(builder: suspend Keycloak.() -> Unit): Keycloak {
     val keycloak = Keycloak().apply { builder() }
     return keycloak
+}
+
+public suspend fun keycloakAuth(
+    clientId: String,
+    instanceUrl: Url,
+    realm: String,
+    httpClient: HttpClient = client,
+    json: Json = defaultJson
+): Keycloak = keycloakAuth {
+    this.clientId = clientId
+    this.instanceUrl = instanceUrl
+    this.realm = realm
+    this.httpClient = httpClient
+    this.json = json
 }
