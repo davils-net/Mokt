@@ -14,6 +14,7 @@
 package dev.redtronics.mokt
 
 import io.ktor.client.*
+import io.ktor.http.*
 import kotlinx.serialization.json.Json
 
 /**
@@ -46,6 +47,10 @@ public interface Provider {
      * @author Nils Jäkel
      * */
     public var json: Json
+
+    public val tokenEndpointUrl: Url
+
+    public var clientId: String?
 }
 
 /**
@@ -82,10 +87,10 @@ public suspend fun microsoftAuth(builder: suspend Microsoft.() -> Unit): Microso
  * @since 0.0.1
  * @author Nils Jäkel
  */
-public suspend fun mojangAuth(builder: suspend Mojang.() -> Unit): Mojang {
-    val mojang = Mojang().apply { builder() }
-    return mojang
-}
+//public suspend fun mojangAuth(builder: suspend Mojang.() -> Unit): Mojang {
+//    val mojang = Mojang().apply { builder() }
+//    return mojang
+//}
 
 /**
  * Central adapter to communicate with the Keycloak authentication provider.
