@@ -12,35 +12,10 @@
 package dev.redtronics.mokt.builder.device
 
 import dev.redtronics.mokt.Keycloak
-import dev.redtronics.mokt.response.AccessResponse
-import dev.redtronics.mokt.response.device.CodeErrorResponse
-import dev.redtronics.mokt.response.device.DeviceAuthStateError
-import dev.redtronics.mokt.response.device.DeviceCodeResponse
+import dev.redtronics.mokt.network.div
 import io.ktor.http.*
 
 public class KeycloakDeviceBuilder internal constructor(override val provider: Keycloak) : DeviceAuth<Keycloak>() {
     override val deviceCodeEndpointUrl: Url
-        get() = Url("")
-
-    override val grantType: String
-        get() = TODO("Not yet implemented")
-
-    override suspend fun requestAuthorizationCode(onRequestError: suspend (err: CodeErrorResponse) -> Unit): DeviceCodeResponse? {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun requestAccessToken(
-        deviceCodeResponse: DeviceCodeResponse,
-        onRequestError: suspend (err: DeviceAuthStateError) -> Unit
-    ): AccessResponse? {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun authLoop(
-        startTime: Long,
-        deviceCodeResponse: DeviceCodeResponse,
-        onRequestError: suspend (err: DeviceAuthStateError) -> Unit
-    ): AccessResponse? {
-        TODO("Not yet implemented")
-    }
+        get() = provider.instanceUrl!! / "/realms/${provider.realm!!}/protocol/openid-connect/auth/device"
 }

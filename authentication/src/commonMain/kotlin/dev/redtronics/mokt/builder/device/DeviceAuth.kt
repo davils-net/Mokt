@@ -15,82 +15,93 @@ package dev.redtronics.mokt.builder.device
 
 import dev.redtronics.mokt.MojangGameAuth
 import dev.redtronics.mokt.Provider
-import dev.redtronics.mokt.html.WebTheme
-import dev.redtronics.mokt.html.userCodePage
+import dev.redtronics.mokt.network.interval
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.device.CodeErrorResponse
 import dev.redtronics.mokt.response.device.DeviceAuthStateError
+import dev.redtronics.mokt.response.device.DeviceAuthStateErrorItem
 import dev.redtronics.mokt.response.device.DeviceCodeResponse
+import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.cio.*
-import kotlinx.html.HTML
+import io.ktor.util.date.*
+import kotlin.time.Duration.Companion.seconds
 
 public abstract class DeviceAuth<out T : Provider> : MojangGameAuth<T>() {
     internal var codeServer: CIOApplicationEngine? = null
 
     public abstract val deviceCodeEndpointUrl: Url
-    public abstract val grantType: String
 
-    /**
-     * Configures the user code handling.
-     *
-     * @param userCode The user code to display.
-     * @param builder The builder to configure the output of the user code.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
+    public var grantType: String = "urn:ietf:params:oauth:grant-type:device_code"
+
     public suspend fun displayCode(userCode: String, builder: suspend UserCodeBuilder.() -> Unit) {
         val userCodeBuilder = UserCodeBuilder(userCode).apply { builder() }
         codeServer = userCodeBuilder.build()
     }
 
-    /**
-     * Configures the user code handling.
-     *
-     * @param userCode The user code to display.
-     * @param displayMode The display mode of the user code.
-     * @param localServerUrl The URL to the local server.
-     * @param webPageTheme The theme of the web page.
-     * @param forceHttps Whether to force HTTPS.
-     * @param shouldDisplayCode Whether to display the user code in the browser.
-     * @param webPage The web page to display the user code.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public suspend fun displayCode(
-        userCode: String,
-        displayMode: DisplayMode,
-        localServerUrl: Url = Url("http://localhost:18769/usercode"),
-        webPageTheme: WebTheme = WebTheme.DARK,
-        forceHttps: Boolean = false,
-        shouldDisplayCode: Boolean = true,
-        webPage: HTML.(userCode: String) -> Unit = { code -> userCodePage(code, webPageTheme) }
-    ) {
-        displayCode(userCode) {
-            this.webPageTheme = webPageTheme
-            this.webPage = webPage
-            this.localServerUrl = localServerUrl
-            this.forceHttps = forceHttps
-            this.shouldDisplayCode = shouldDisplayCode
-
-            if (displayMode == DisplayMode.BROWSER) {
-                inBrowser()
+    public suspend fun requestAuthorizationCode(
+        additionalParameters: Map<String, String> = mapOf(),
+        onRequestError: suspend (err: CodeErrorResponse) -> Unit = {},
+    ): DeviceCodeResponse? {
+        val response = provider.httpClient.submitForm(
+            url = deviceCodeEndpointUrl.toString(),
+            formParameters = parameters {
+                append("client_id", provider.clientId!!)
+                append("scope", provider.scopes.joinToString(" ") { it.value })
+                additionalParameters.forEach {
+                    append(it.key, it.value)
+                }
             }
+        )
+        if (!response.status.isSuccess()) {
+            onRequestError(provider.json.decodeFromString(CodeErrorResponse.serializer(), response.bodyAsText()))
+            return null
         }
+        return provider.json.decodeFromString(DeviceCodeResponse.serializer(), response.bodyAsText())
     }
 
-    public abstract suspend fun requestAuthorizationCode(onRequestError: suspend (err: CodeErrorResponse) -> Unit = {}): DeviceCodeResponse?
-
-    public abstract suspend fun requestAccessToken(
+    public suspend fun requestAccessToken(
         deviceCodeResponse: DeviceCodeResponse,
-        onRequestError: suspend (err: DeviceAuthStateError)-> Unit = {}
-    ): AccessResponse?
+        additionalParameters: Map<String, String> = mapOf(),
+        onRequestError: suspend (err: DeviceAuthStateError) -> Unit = {},
+    ): AccessResponse? {
+        val startTime = getTimeMillis()
+        return authLoop(startTime, deviceCodeResponse, additionalParameters, onRequestError)
+    }
 
-    public abstract suspend fun authLoop(
+    internal suspend fun authLoop(
         startTime: Long,
         deviceCodeResponse: DeviceCodeResponse,
-        onRequestError: suspend (err: DeviceAuthStateError) -> Unit
-    ): AccessResponse?
+        additionalParameters: Map<String, String>,
+        onRequestError: suspend (err: DeviceAuthStateError) -> Unit,
+    ): AccessResponse? = interval(
+        interval = deviceCodeResponse.interval.seconds,
+        cond = { getTimeMillis() - startTime < deviceCodeResponse.expiresIn * 1000 }
+    ) {
+        val response = provider.httpClient.submitForm(
+            url = provider.tokenEndpointUrl.toString(),
+            formParameters = parameters {
+                append("client_id", provider.clientId!!)
+                append("device_code", deviceCodeResponse.deviceCode)
+                append("grant_type", grantType)
+                additionalParameters.forEach {
+                    append(it.key, it.value)
+                }
+            }
+        )
+
+        val responseBody = response.bodyAsText()
+        if (responseBody.contains("error")) {
+            val errorResponse = provider.json.decodeFromString(DeviceAuthStateError.serializer(), responseBody)
+            if (errorResponse.error != DeviceAuthStateErrorItem.AUTHORIZATION_PENDING) {
+                onRequestError(errorResponse)
+                cancel()
+            }
+            return@interval null
+        }
+
+        codeServer?.stop()
+        return@interval provider.json.decodeFromString(AccessResponse.serializer(), responseBody)
+    }
 }
