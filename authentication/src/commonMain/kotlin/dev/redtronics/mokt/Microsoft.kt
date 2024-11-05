@@ -59,7 +59,7 @@ public class Microsoft internal constructor() : Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var clientId: String? = getEnv("MS_CLIENT_ID")
+    override var clientId: String? = getEnv("MS_CLIENT_ID")
 
     /**
      * The [Tenant] value in the path of the request URL can be used to control
@@ -87,7 +87,7 @@ public class Microsoft internal constructor() : Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public val tokenEndpointUrl: Url
+    override val tokenEndpointUrl: Url
         get() = Url("https://login.microsoftonline.com/${tenant.value}/oauth2/v2.0/token")
 
     /**
