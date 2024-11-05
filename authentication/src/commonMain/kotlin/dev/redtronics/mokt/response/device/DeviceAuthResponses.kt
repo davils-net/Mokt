@@ -38,5 +38,5 @@ public data class DeviceCodeResponse(
     @SerialName("expires_in")
     public val expiresIn: Int,
     public val interval: Int,
-    public val message: String
+    public val message: String? = null
 )
