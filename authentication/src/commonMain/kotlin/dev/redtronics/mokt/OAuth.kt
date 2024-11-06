@@ -14,26 +14,6 @@
 package dev.redtronics.mokt
 
 /**
- * Defines the different authentication methods used by the oauth.
- *
- * @property authMethodName The name of the authentication method.
- *
- * @since 0.0.1
- * @author Nils Jäkel
- */
-public enum class AuthMethod(public val authMethodName: String) {
-    /**
-     * The grant code authentication method.
-     * */
-    GRANT_CODE("grant_code"),
-
-    /**
-     * The device authentication method.
-     * */
-    DEVICE_AUTH("device_auth");
-}
-
-/**
  * The [Scope] in the request path can be set to specify which resources or permissions your
  * application is requesting access to.
  *
