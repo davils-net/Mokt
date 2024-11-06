@@ -9,20 +9,26 @@
  * and/or sell copies of the Software.
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package dev.redtronics.mokt.builder.device
 
 import dev.redtronics.mokt.Microsoft
 import io.ktor.http.*
 
 /**
- * Builder to configure the Microsoft device authentication flow.
+ * Microsoft device authentication builder.
+ * Configures the device authentication flow for the Microsoft provider.
  *
  * @since 0.0.1
  * @author Nils Jäkel
  * */
 public class MicrosoftDeviceBuilder internal constructor(override val provider: Microsoft) : DeviceAuth<Microsoft>() {
+    /**
+     * The url of the device authentication endpoint to get the device and user code.
+     * Also, the url would automatically resolve to the correct realm.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     override val deviceCodeEndpointUrl: Url
         get() = Url("https://login.microsoftonline.com/${provider.tenant.value}/oauth2/v2.0/devicecode")
 

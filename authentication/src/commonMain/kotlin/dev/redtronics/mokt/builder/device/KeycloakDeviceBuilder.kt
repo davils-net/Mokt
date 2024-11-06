@@ -15,7 +15,21 @@ import dev.redtronics.mokt.Keycloak
 import dev.redtronics.mokt.network.div
 import io.ktor.http.*
 
+/**
+ * Keycloak device authentication builder.
+ * Configures the device authentication flow for the Keycloak provider.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public class KeycloakDeviceBuilder internal constructor(override val provider: Keycloak) : DeviceAuth<Keycloak>() {
+    /**
+     * The url of the device authentication endpoint to get the device and user code.
+     * Also, the url would automatically resolve to the correct realm.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     override val deviceCodeEndpointUrl: Url
         get() = provider.instanceUrl!! / "/realms/${provider.realm!!}/protocol/openid-connect/auth/device"
 
