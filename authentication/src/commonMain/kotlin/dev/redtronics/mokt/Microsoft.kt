@@ -33,20 +33,7 @@ public class Microsoft internal constructor() : Provider() {
     override val name: String
         get() = "Microsoft"
 
-    /**
-     * The http client used by the Microsoft provider.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
     override var httpClient: HttpClient = client
-
-    /**
-     * The json used by the Microsoft provider.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
     override var json: Json = defaultJson
 
     /**
