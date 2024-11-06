@@ -9,8 +9,6 @@
  * and/or sell copies of the Software.
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package dev.redtronics.mokt
 
 import dev.redtronics.mokt.Tenant.*
@@ -76,7 +74,8 @@ public class Microsoft internal constructor() : Provider() {
     public var tenant: Tenant = CONSUMERS
 
     /**
-     * The url of the microsoft token endpoint.
+     * The url of the microsoft's token endpoint to get the access token.
+     * It would automatically resolve by on the [tenant] value.
      *
      * @since 0.0.1
      * @author Nils Jäkel
@@ -84,6 +83,16 @@ public class Microsoft internal constructor() : Provider() {
     override val tokenEndpointUrl: Url
         get() = Url("https://login.microsoftonline.com/${tenant.value}/oauth2/v2.0/token")
 
+    /**
+     * The client secret for the Microsoft provider.
+     * If the client secret is not set, the provider will try to get the client secret
+     * from the environment `MS_CLIENT_SECRET.`
+     *
+     * @throws IllegalArgumentException If the client secret is not valid or null.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     override var clientSecret: String? = getEnv("KEYCLOAK_CLIENT_SECRET")
 
     /**
@@ -135,12 +144,20 @@ public class Microsoft internal constructor() : Provider() {
     }
 
     override suspend fun requestAccessTokenFromRefreshToken(
-        accessResponse: AccessResponse,
+        refreshToken: String,
         onRequestError: suspend (response: HttpResponse) -> Unit
     ): AccessResponse? {
         TODO("Not yet implemented")
     }
 
+    /**
+     * Checks if the client id is valid.
+     *
+     * @throws IllegalArgumentException If the client id is not valid.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     override suspend fun build() {
         require(clientId != null) { "Client id is not set" }
         val isClientIdValid = Regex("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}").matches(clientId!!)
