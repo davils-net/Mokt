@@ -57,7 +57,7 @@ public class IntervalPoller<T> internal constructor(
      * */
     internal suspend fun poll(cond: suspend () -> Boolean): T? {
         while (cond() && !isCancelled) {
-            delay(interval.toLong(DurationUnit.SECONDS))
+            delay(interval.toLong(DurationUnit.MILLISECONDS))
             return builder() ?: continue
         }
         return null
