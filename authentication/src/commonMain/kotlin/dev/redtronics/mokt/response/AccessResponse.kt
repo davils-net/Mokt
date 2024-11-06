@@ -22,7 +22,7 @@ public data class AccessResponse(
     @SerialName("expires_in")
     public val expiresIn: Int,
     @SerialName("ext_expires_in")
-    public val extExpiresIn: Int,
+    public val extExpiresIn: Int? = null,
     @SerialName("access_token")
     public val accessToken: String,
     @SerialName("refresh_token")
