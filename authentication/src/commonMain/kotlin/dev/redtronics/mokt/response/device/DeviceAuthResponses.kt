@@ -35,6 +35,8 @@ public data class DeviceCodeResponse(
     public val userCode: String,
     @SerialName("verification_uri")
     public val verificationUri: String,
+    @SerialName("verification_uri_complete")
+    public val verificationUriComplete: String? = null,
     @SerialName("expires_in")
     public val expiresIn: Int,
     public val interval: Int,
