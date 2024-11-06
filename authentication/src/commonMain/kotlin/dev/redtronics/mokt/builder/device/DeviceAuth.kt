@@ -28,21 +28,63 @@ import io.ktor.server.cio.*
 import io.ktor.util.date.*
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Base class for all device authentication.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public abstract class DeviceAuth<out T : Provider> : MojangGameAuth<T>() {
+    /**
+     * The local code redirect server to display the user code.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     private var codeServer: CIOApplicationEngine? = null
 
+    /**
+     * Endpoint to request the device and user code.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public abstract val deviceCodeEndpointUrl: Url
 
+    /**
+     * The grant type to use for the device code endpoint.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public abstract var grantType: String
 
+    /**
+     * Displays the user code to the user.
+     *
+     * @param deviceCodeResponse The device code response.
+     * @param builder The builder to configure the user code display.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public suspend fun displayCode(deviceCodeResponse: DeviceCodeResponse, builder: suspend UserCodeBuilder.() -> Unit) {
         val userCodeBuilder = UserCodeBuilder(deviceCodeResponse).apply { builder() }
         codeServer = userCodeBuilder.build()
     }
 
+    /**
+     * Requests the authorization code from the device code endpoint.
+     *
+     * @param additionalParameters The additional parameters to be appended to the request.
+     * @param onRequestError The function to be called if an error occurs during the authorization code request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public suspend fun requestAuthorizationCode(
         additionalParameters: Map<String, String> = mapOf(),
-        onRequestError: suspend (err: CodeErrorResponse) -> Unit = {},
+        onRequestError: suspend (err: CodeErrorResponse) -> Unit = {}
     ): DeviceCodeResponse? {
         val response = provider.httpClient.submitForm(
             url = deviceCodeEndpointUrl.toString(),
@@ -66,30 +108,61 @@ public abstract class DeviceAuth<out T : Provider> : MojangGameAuth<T>() {
         return provider.json.decodeFromString(DeviceCodeResponse.serializer(), response.bodyAsText())
     }
 
+    /**
+     * Requests the access token from the device code endpoint.
+     *
+     * @param deviceCodeResponse The device code response.
+     * @param additionalParameters The additional parameters to be appended to the request.
+     * @param onRequestError The function to be called if an error occurs during the access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public suspend fun requestAccessToken(
         deviceCodeResponse: DeviceCodeResponse,
         additionalParameters: Map<String, String> = mapOf(),
-        onRequestError: suspend (err: DeviceAuthStateError) -> Unit = {},
+        onRequestError: suspend (err: DeviceAuthStateError) -> Unit = {}
     ): AccessResponse? {
         val startTime = getTimeMillis()
         return authLoop(startTime, deviceCodeResponse, additionalParameters, onRequestError)
     }
 
+    /**
+     * Requests the access token from the device code endpoint.
+     *
+     * @param deviceCodeResponse The device code response.
+     * @param additionalParameters The additional parameters to be appended to the request.
+     * @param onRequestError The function to be called if an error occurs during the access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public suspend fun requestAccessToken(
         deviceCodeResponse: DeviceCodeResponse,
         additionalParameters: Map<String, String> = mapOf(),
         displayUserCode: suspend UserCodeBuilder.() -> Unit = {},
-        onRequestError: suspend (err: DeviceAuthStateError) -> Unit = {},
+        onRequestError: suspend (err: DeviceAuthStateError) -> Unit = {}
     ): AccessResponse? {
         displayCode(deviceCodeResponse, displayUserCode)
         return requestAccessToken(deviceCodeResponse, additionalParameters, onRequestError)
     }
 
+    /**
+     * Interval to poll for the access token from the device token endpoint.
+     *
+     * @param startTime The current start time.
+     * @param deviceCodeResponse The device code response.
+     * @param additionalParameters The additional parameters to be appended to the request.
+     * @param onRequestError The function to be called if an error occurs during the access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     internal suspend fun authLoop(
         startTime: Long,
         deviceCodeResponse: DeviceCodeResponse,
         additionalParameters: Map<String, String>,
-        onRequestError: suspend (err: DeviceAuthStateError) -> Unit,
+        onRequestError: suspend (err: DeviceAuthStateError) -> Unit
     ): AccessResponse? = interval(
         interval = deviceCodeResponse.interval.seconds,
         cond = { getTimeMillis() - startTime < deviceCodeResponse.expiresIn * 1000 }
