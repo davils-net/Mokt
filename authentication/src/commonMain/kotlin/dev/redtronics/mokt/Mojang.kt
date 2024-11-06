@@ -22,23 +22,6 @@ import dev.redtronics.mokt.response.mojang.XstsResponse
 import io.ktor.client.statement.*
 
 /**
- * Mojang authentication provider.
- * It only interacts with the Mojang API and does not support Microsoft authentication.
- * You must implement this with your own provider.
- *
- * @since 0.0.1
- * @author Nils Jäkel
- * */
-//public class Mojang internal constructor() : Provider, MojangGameAuth<Mojang>() {
-//    override val name: String
-//        get() = "Mojang"
-//
-//    override var httpClient: HttpClient = client
-//    override var json: Json = defaultJson
-//    override val provider: Mojang = this
-//}
-
-/**
  * Implements the complete mojang authentication to the provider, that is inherited from [MojangGameAuth].
  *
  * @since 0.0.1
