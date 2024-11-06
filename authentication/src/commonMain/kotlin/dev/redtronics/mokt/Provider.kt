@@ -15,7 +15,9 @@ package dev.redtronics.mokt
 
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
+import dev.redtronics.mokt.response.AccessResponse
 import io.ktor.client.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
 
@@ -57,6 +59,11 @@ public abstract class Provider {
     public abstract var clientSecret: String?
 
     public var scopes: List<Scope> = Scope.allScopes
+
+    public abstract suspend fun requestAccessTokenFromRefreshToken(
+        accessResponse: AccessResponse,
+        onRequestError: suspend (response: HttpResponse) -> Unit = {}
+    ): AccessResponse?
 
     internal abstract suspend fun build()
 }
