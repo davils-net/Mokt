@@ -71,6 +71,13 @@ public class Keycloak internal constructor() : Provider() {
         return json.decodeFromString(AccessResponse.serializer(), response.bodyAsText())
     }
 
+    override suspend fun requestAccessTokenFromRefreshToken(
+        accessResponse: AccessResponse,
+        onRequestError: suspend (response: HttpResponse) -> Unit,
+    ): AccessResponse? {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun build() {
         require(clientId != null && realm != null && instanceUrl != null) { "You need to set client id, realm and instance url" }
     }

@@ -18,7 +18,9 @@ import dev.redtronics.mokt.builder.GrantCodeBuilder
 import dev.redtronics.mokt.builder.device.MicrosoftDeviceBuilder
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
+import dev.redtronics.mokt.response.AccessResponse
 import io.ktor.client.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
 
@@ -85,18 +87,6 @@ public class Microsoft internal constructor() : Provider() {
     override var clientSecret: String? = getEnv("KEYCLOAK_CLIENT_SECRET")
 
     /**
-     * Detects which authentication method is used.
-     * If no authentication method used, the auth method will be set to null.
-     *
-     * @see AuthMethod
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public var authMethod: AuthMethod? = null
-        private set
-
-    /**
      * Uses microsoft's code grant flow.
      *
      * The OAuth 2.0 authorization code grant, also known as the authorization code flow,
@@ -115,8 +105,6 @@ public class Microsoft internal constructor() : Provider() {
      * @author Nils Jäkel
      * */
     public suspend fun <T> codeGrant(builder: suspend GrantCodeBuilder.() -> T): T {
-        authMethod = AuthMethod.GRANT_CODE
-
         val grantCodeBuilder = GrantCodeBuilder(this)
         return builder(grantCodeBuilder).apply { build() }
     }
@@ -142,10 +130,15 @@ public class Microsoft internal constructor() : Provider() {
      * @author Nils Jäkel
      * */
     public suspend fun <T> device(builder: suspend MicrosoftDeviceBuilder.() -> T): T {
-        authMethod = AuthMethod.DEVICE_AUTH
-
         val deviceBuilder = MicrosoftDeviceBuilder(this)
         return builder(deviceBuilder).apply { build() }
+    }
+
+    override suspend fun requestAccessTokenFromRefreshToken(
+        accessResponse: AccessResponse,
+        onRequestError: suspend (response: HttpResponse) -> Unit
+    ): AccessResponse? {
+        TODO("Not yet implemented")
     }
 
     override suspend fun build() {
