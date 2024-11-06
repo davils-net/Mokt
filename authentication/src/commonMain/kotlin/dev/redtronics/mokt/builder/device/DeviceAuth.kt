@@ -29,7 +29,7 @@ import io.ktor.util.date.*
 import kotlin.time.Duration.Companion.seconds
 
 public abstract class DeviceAuth<out T : Provider> : MojangGameAuth<T>() {
-    internal var codeServer: CIOApplicationEngine? = null
+    private var codeServer: CIOApplicationEngine? = null
 
     public abstract val deviceCodeEndpointUrl: Url
 
