@@ -34,7 +34,7 @@ import kotlin.time.Duration.Companion.seconds
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public abstract class DeviceAuth<out T : Provider> : MojangGameAuth<T>() {
+public abstract class DeviceAuth<out T : Provider> internal constructor() : MojangGameAuth<T>() {
     /**
      * The local code redirect server to display the user code.
      *
