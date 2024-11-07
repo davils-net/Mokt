@@ -13,6 +13,10 @@
 
 package dev.redtronics.mokt
 
+public interface OAuth {
+    public val grantType: String
+}
+
 /**
  * The [Scope] in the request path can be set to specify which resources or permissions your
  * application is requesting access to.
