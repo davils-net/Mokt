@@ -27,7 +27,7 @@ public class XstsBuilder internal constructor(
     override val httpClient: HttpClient,
     override val json: Json,
     private val xBoxResponse: XBoxResponse
-) : MojangBaseAuthBuilder() {
+) : MinecraftAuthBuilder() {
     public val sandboxId: String
         get() = "RETAIL"
 

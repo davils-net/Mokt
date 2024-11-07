@@ -23,9 +23,7 @@ import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import kotlinx.html.HTML
 
-public class UserCodeBuilder internal constructor(
-    private val deviceCodeResponse: DeviceCodeResponse,
-) {
+public class UserCodeBuilder internal constructor(private val deviceCodeResponse: DeviceCodeResponse) {
     private var codeServer: CIOApplicationEngine? = null
 
     public val verificationUrl: Url
@@ -52,6 +50,10 @@ public class UserCodeBuilder internal constructor(
             openInBrowser(localServerUrl)
         }
         openInBrowser(verificationUrl)
+    }
+
+    public suspend fun inTerminal() {
+
     }
 
     internal fun build(): CIOApplicationEngine? = codeServer

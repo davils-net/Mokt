@@ -33,7 +33,7 @@ public class XBoxBuilder internal constructor(
     override val httpClient: HttpClient,
     override val json: Json,
     private val accessToken: String
-) : MojangBaseAuthBuilder() {
+) : MinecraftAuthBuilder() {
     public val relyingPartyUrl: Url
         get() = Url("http://auth.xboxlive.com")
 

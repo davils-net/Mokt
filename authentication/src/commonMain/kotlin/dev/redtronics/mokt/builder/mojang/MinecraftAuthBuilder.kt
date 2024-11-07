@@ -20,7 +20,7 @@ import kotlinx.serialization.json.Json
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public abstract class MojangBaseAuthBuilder {
+public abstract class MinecraftAuthBuilder {
     internal abstract val httpClient: HttpClient
     internal abstract val json: Json
 }
