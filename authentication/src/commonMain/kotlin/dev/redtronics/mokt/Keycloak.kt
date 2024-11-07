@@ -14,6 +14,7 @@
 package dev.redtronics.mokt
 
 import dev.redtronics.mokt.builder.device.KeycloakDeviceBuilder
+import dev.redtronics.mokt.builder.grant.KeycloakGrantBuilder
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
 import dev.redtronics.mokt.network.div
@@ -123,6 +124,11 @@ public class Keycloak internal constructor() : Provider() {
      * */
     public suspend fun <T> device(builder: suspend KeycloakDeviceBuilder.() -> T): T {
         val keycloakBuilder = KeycloakDeviceBuilder(this)
+        return builder(keycloakBuilder).apply { build() }
+    }
+
+    public suspend fun <T> grant(builder: suspend KeycloakGrantBuilder.() -> T): T {
+        val keycloakBuilder = KeycloakGrantBuilder(this)
         return builder(keycloakBuilder).apply { build() }
     }
 
