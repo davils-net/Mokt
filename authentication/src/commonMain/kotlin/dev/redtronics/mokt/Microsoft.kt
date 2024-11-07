@@ -12,8 +12,8 @@
 package dev.redtronics.mokt
 
 import dev.redtronics.mokt.Tenant.*
-import dev.redtronics.mokt.builder.GrantCodeBuilder
 import dev.redtronics.mokt.builder.device.MicrosoftDeviceBuilder
+import dev.redtronics.mokt.builder.grant.GrantCodeBuilder
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
 import dev.redtronics.mokt.response.AccessResponse
@@ -100,7 +100,7 @@ public class Microsoft internal constructor() : Provider() {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun <T> codeGrant(builder: suspend GrantCodeBuilder.() -> T): T {
+    public suspend fun <T> grant(builder: suspend GrantCodeBuilder.() -> T): T {
         val grantCodeBuilder = GrantCodeBuilder(this)
         return builder(grantCodeBuilder).apply { build() }
     }
