@@ -13,10 +13,7 @@
 
 package dev.redtronics.mokt.builder.grant
 
-import dev.redtronics.mokt.MojangGameAuth
-import dev.redtronics.mokt.Provider
-import dev.redtronics.mokt.generateRandomIdentifier
-import dev.redtronics.mokt.getEnv
+import dev.redtronics.mokt.*
 import dev.redtronics.mokt.html.failurePage
 import dev.redtronics.mokt.html.successPage
 import dev.redtronics.mokt.network.openInBrowser
@@ -34,7 +31,7 @@ import io.ktor.server.util.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.html.HTML
 
-public abstract class GrantAuth<out T : Provider> internal constructor() : MojangGameAuth<T>() {
+public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth, MojangGameAuth<T>() {
     public abstract val authorizeEndpointUrl: Url
 
     /**
@@ -58,7 +55,7 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : Mojan
 
     public var state: String = generateRandomIdentifier()
 
-    public val grantType: String = "authorization_code"
+    override val grantType: String = "authorization_code"
 
     /**
      * Checks if the local redirect URL is using HTTPS.

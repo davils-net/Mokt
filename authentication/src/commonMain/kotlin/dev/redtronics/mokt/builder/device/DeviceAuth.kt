@@ -14,6 +14,7 @@
 package dev.redtronics.mokt.builder.device
 
 import dev.redtronics.mokt.MojangGameAuth
+import dev.redtronics.mokt.OAuth
 import dev.redtronics.mokt.Provider
 import dev.redtronics.mokt.network.interval
 import dev.redtronics.mokt.response.AccessResponse
@@ -34,7 +35,7 @@ import kotlin.time.Duration.Companion.seconds
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public abstract class DeviceAuth<out T : Provider> internal constructor() : MojangGameAuth<T>() {
+public abstract class DeviceAuth<out T : Provider> internal constructor() : OAuth, MojangGameAuth<T>() {
     /**
      * The local code redirect server to display the user code.
      *
@@ -43,6 +44,8 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : Moja
      * */
     private var codeServer: CIOApplicationEngine? = null
 
+    override val grantType: String = "urn:ietf:params:oauth:grant-type:device_code"
+
     /**
      * Endpoint to request the device and user code.
      *
@@ -50,14 +53,6 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : Moja
      * @author Nils Jäkel
      * */
     public abstract val deviceCodeEndpointUrl: Url
-
-    /**
-     * The grant type to use for the device code endpoint.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public abstract var grantType: String
 
     /**
      * Displays the user code to the user.

@@ -32,6 +32,4 @@ public class KeycloakDeviceBuilder internal constructor(override val provider: K
      * */
     override val deviceCodeEndpointUrl: Url
         get() = provider.instanceUrl!! / "/realms/${provider.realm!!}/protocol/openid-connect/auth/device"
-
-    override var grantType: String = "urn:ietf:params:oauth:grant-type:device_code"
 }

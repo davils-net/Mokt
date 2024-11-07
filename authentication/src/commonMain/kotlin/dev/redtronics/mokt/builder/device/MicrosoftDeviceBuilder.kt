@@ -31,6 +31,4 @@ public class MicrosoftDeviceBuilder internal constructor(override val provider: 
      * */
     override val deviceCodeEndpointUrl: Url
         get() = Url("https://login.microsoftonline.com/${provider.tenant.value}/oauth2/v2.0/devicecode")
-
-    override var grantType: String = "urn:ietf:params:oauth:grant-type:device_code"
 }
