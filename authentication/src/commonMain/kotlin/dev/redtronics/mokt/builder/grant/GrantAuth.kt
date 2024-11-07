@@ -1,9 +1,9 @@
 /*
  * MIT License
- * Copyright 2024 Nils Jäkel & David Ernst
+ * Copyright 2024 Nils Jäkel  & David Ernst
  *
  * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the “Software”),
+ * a copy of this software and associated documentation files (the "Software”),
  * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software.
@@ -11,20 +11,20 @@
 
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package dev.redtronics.mokt.builder
+package dev.redtronics.mokt.builder.grant
 
-import dev.redtronics.mokt.Microsoft
 import dev.redtronics.mokt.MojangGameAuth
+import dev.redtronics.mokt.Provider
+import dev.redtronics.mokt.generateRandomIdentifier
 import dev.redtronics.mokt.getEnv
 import dev.redtronics.mokt.html.failurePage
 import dev.redtronics.mokt.html.successPage
 import dev.redtronics.mokt.network.openInBrowser
 import dev.redtronics.mokt.response.AccessResponse
-import dev.redtronics.mokt.response.device.CodeErrorResponse
 import dev.redtronics.mokt.response.GrantCodeResponse
+import dev.redtronics.mokt.response.device.CodeErrorResponse
 import dev.redtronics.mokt.server.codeGrantRouting
 import dev.redtronics.mokt.server.setup
-import dev.redtronics.mokt.generateRandomIdentifier
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -34,7 +34,9 @@ import io.ktor.server.util.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.html.HTML
 
-public class GrantCodeBuilder internal constructor(override val provider: Microsoft) : MojangGameAuth<Microsoft>() {
+public abstract class GrantAuth<out T : Provider> internal constructor() : MojangGameAuth<T>() {
+    public abstract val authorizeEndpointUrl: Url
+
     /**
      * The local redirect URL. On default, it will try to get the url from the environment variable `LOCAL_REDIRECT_URL`.
      * Otherwise, the url `http://localhost:8080` will be used.
@@ -43,9 +45,6 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
      * @author Nils Jäkel
      * */
     public var localRedirectUrl: Url = Url(getEnv("LOCAL_REDIRECT_URL") ?: "http://localhost:8080")
-
-    public val authorizeEndpointUrl: Url
-        get() = Url("https://login.microsoftonline.com/${provider.tenant.value}/oauth2/v2.0/authorize")
 
     /**
      * If you are not using code, you are using directly the hybrid flow.
@@ -122,6 +121,7 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
 
     public suspend fun requestAccessToken(
         grantCode: GrantCodeResponse,
+        additionalParameters: Map<String, String> = mapOf(),
         onRequestError: suspend (response: HttpResponse) -> Unit = {}
     ): AccessResponse? {
         val response = provider.httpClient.submitForm(
@@ -132,6 +132,15 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
                 append("code", grantCode.code)
                 append("redirect_uri", localRedirectUrl.toString())
                 append("grant_type", grantType)
+                append("state", state)
+
+                if (provider.clientSecret != null) {
+                    append("client_secret", provider.clientSecret!!)
+                }
+
+                additionalParameters.forEach {
+                    append(it.key, it.value)
+                }
             }
         )
         if (!response.status.isSuccess()) {
