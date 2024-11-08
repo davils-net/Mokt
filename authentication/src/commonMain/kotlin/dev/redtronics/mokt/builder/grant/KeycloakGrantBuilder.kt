@@ -9,21 +9,13 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt.response.grant
+package dev.redtronics.mokt.builder.grant
 
-import kotlinx.serialization.Serializable
+import dev.redtronics.mokt.Keycloak
+import dev.redtronics.mokt.network.div
+import io.ktor.http.*
 
-/**
- * Represents the OAuth Code from the auth endpoints.
- *
- * @property code The OAuth Code.
- * @property state The state of the code as [Int].
- *
- * @since 0.0.1
- * @author Nils Jäkel
- * */
-@Serializable
-public data class GrantCodeResponse(
-    public val code: String,
-    public val state: String
-)
+public class KeycloakGrantBuilder internal constructor(override val provider: Keycloak) : GrantAuth<Keycloak>() {
+    override val authorizeEndpointUrl: Url
+        get() = provider.instanceUrl / "/realms/${provider.realm}/protocol/openid-connect/auth"
+}

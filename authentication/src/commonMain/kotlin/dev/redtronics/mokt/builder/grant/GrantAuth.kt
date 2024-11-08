@@ -13,18 +13,14 @@
 
 package dev.redtronics.mokt.builder.grant
 
-import dev.redtronics.mokt.Microsoft
-import dev.redtronics.mokt.MojangGameAuth
-import dev.redtronics.mokt.getEnv
-import dev.redtronics.mokt.html.failurePage
-import dev.redtronics.mokt.html.successPage
-import dev.redtronics.mokt.openInBrowser
+import dev.redtronics.mokt.*
+import dev.redtronics.mokt.html.redirectPage
+import dev.redtronics.mokt.network.openInBrowser
 import dev.redtronics.mokt.response.AccessResponse
+import dev.redtronics.mokt.response.GrantCodeResponse
 import dev.redtronics.mokt.response.device.CodeErrorResponse
-import dev.redtronics.mokt.response.grant.GrantCodeResponse
-import dev.redtronics.mokt.server.codeGrantRouting
+import dev.redtronics.mokt.server.grantRouting
 import dev.redtronics.mokt.server.setup
-import dev.redtronics.mokt.utils.generateRandomIdentifier
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -34,7 +30,9 @@ import io.ktor.server.util.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.html.HTML
 
-public class GrantCodeBuilder internal constructor(override val provider: Microsoft) : MojangGameAuth<Microsoft>() {
+public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth, MojangGameAuth<T>() {
+    public abstract val authorizeEndpointUrl: Url
+
     /**
      * The local redirect URL. On default, it will try to get the url from the environment variable `LOCAL_REDIRECT_URL`.
      * Otherwise, the url `http://localhost:8080` will be used.
@@ -43,9 +41,6 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
      * @author Nils Jäkel
      * */
     public var localRedirectUrl: Url = Url(getEnv("LOCAL_REDIRECT_URL") ?: "http://localhost:8080")
-
-    public val authorizeEndpointUrl: Url
-        get() = Url("https://login.microsoftonline.com/${provider.tenant.value}/oauth2/v2.0/authorize")
 
     /**
      * If you are not using code, you are using directly the hybrid flow.
@@ -59,7 +54,7 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
 
     public var state: String = generateRandomIdentifier()
 
-    public val grantType: String = "authorization_code"
+    override val grantType: String = "authorization_code"
 
     /**
      * Checks if the local redirect URL is using HTTPS.
@@ -76,7 +71,13 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var successRedirectPage: HTML.() -> Unit = { successPage() }
+    public var successRedirectPage: HTML.() -> Unit = { redirectPage(
+        "#ffffff",
+        "#009320",
+        "#bcff00",
+        "Authentication successful",
+        "You can close this page now!"
+    ) }
 
     /**
      * The page that will be shown after a failed authorization.
@@ -84,7 +85,13 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var failureRedirectPage: HTML.() -> Unit = { failurePage() }
+    public var failureRedirectPage: HTML.() -> Unit = { redirectPage(
+        "#ffffff",
+        "#b20000",
+        "#ff0000",
+        "Authentication failed",
+        "Please try again!"
+    ) }
 
     public suspend fun requestGrantCode(
         browser: suspend (url: Url) -> Unit = { url -> openInBrowser(url) },
@@ -95,7 +102,7 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
 
         val authServer = embeddedServer(CIO, localRedirectUrl.port, localRedirectUrl.host) {
             setup()
-            codeGrantRouting(path, authCodeChannel, successRedirectPage, failureRedirectPage, onRequestError)
+            grantRouting(path, authCodeChannel, successRedirectPage, failureRedirectPage, onRequestError)
         }
         authServer.start()
 
@@ -104,7 +111,7 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
             host = authorizeEndpointUrl.host
             path(authorizeEndpointUrl.fullPath)
             parameters.apply {
-                append("client_id", provider.clientId!!)
+                append("client_id", provider.clientId)
                 append("response_type", responseType.value)
                 append("redirect_uri", localRedirectUrl.toString())
                 append("response_mode", responseMode.value)
@@ -122,16 +129,26 @@ public class GrantCodeBuilder internal constructor(override val provider: Micros
 
     public suspend fun requestAccessToken(
         grantCode: GrantCodeResponse,
+        additionalParameters: Map<String, String> = mapOf(),
         onRequestError: suspend (response: HttpResponse) -> Unit = {}
     ): AccessResponse? {
         val response = provider.httpClient.submitForm(
             url = provider.tokenEndpointUrl.toString(),
             parameters {
-                append("client_id", provider.clientId!!)
+                append("client_id", provider.clientId)
                 append("scope", provider.scopes.joinToString(" ") { it.value })
                 append("code", grantCode.code)
                 append("redirect_uri", localRedirectUrl.toString())
                 append("grant_type", grantType)
+                append("state", state)
+
+                if (provider.clientSecret != null) {
+                    append("client_secret", provider.clientSecret!!)
+                }
+
+                additionalParameters.forEach {
+                    append(it.key, it.value)
+                }
             }
         )
         if (!response.status.isSuccess()) {

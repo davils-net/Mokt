@@ -9,21 +9,11 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt
+package dev.redtronics.mokt.network
 
 import io.ktor.http.*
 import kotlinx.coroutines.await
 import kotlin.js.Promise
-
-public actual val os: OsType by lazy {
-    val platform = js("navigator.platform").toString().lowercase()
-    when {
-        platform.contains("win") -> OsType.WINDOWS
-        platform.contains("android") -> OsType.ANDROID
-        platform.contains("linux") || platform.contains("aix") -> OsType.LINUX
-        else -> OsType.UNKNOWN
-    }
-}
 
 public actual suspend fun openInBrowser(url: Url): Unit = open(url).await()
 

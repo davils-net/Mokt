@@ -9,18 +9,14 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt.builder.mojang
+package dev.redtronics.mokt.network
 
-import io.ktor.client.*
-import kotlinx.serialization.json.Json
+import io.ktor.http.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
+import dev.redtronics.mokt.cinterop.open_url
 
-/**
- * Base class for all mojang authentication builders.
- *
- * @since 0.0.1
- * @author Nils Jäkel
- * */
-public abstract class MojangBaseAuthBuilder {
-    internal abstract val httpClient: HttpClient
-    internal abstract val json: Json
+public actual suspend fun openInBrowser(url: Url): Unit = withContext(Dispatchers.IO) {
+    open_url(url.toString())
 }

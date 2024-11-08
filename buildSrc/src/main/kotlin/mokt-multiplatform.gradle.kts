@@ -17,8 +17,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    org.jetbrains.kotlin.multiplatform
     org.jetbrains.kotlin.plugin.serialization
+    org.jetbrains.kotlinx.atomicfu
+    org.jetbrains.kotlin.multiplatform
     io.kotest.multiplatform
     org.jetbrains.dokka
 }

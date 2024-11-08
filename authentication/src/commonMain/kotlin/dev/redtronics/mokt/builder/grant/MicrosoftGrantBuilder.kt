@@ -9,14 +9,14 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt.utils
+@file:Suppress("MemberVisibilityCanBePrivate")
 
-import kotlin.random.Random
+package dev.redtronics.mokt.builder.grant
 
-public fun generateRandomIdentifier(length: Int = 32): String {
-    val charPool = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-    return (1..length)
-        .map { Random.nextInt(0, charPool.size) }
-        .map(charPool::get)
-        .joinToString("")
+import dev.redtronics.mokt.Microsoft
+import io.ktor.http.*
+
+public class GrantCodeBuilder internal constructor(override val provider: Microsoft) : GrantAuth<Microsoft>() {
+    override val authorizeEndpointUrl: Url
+        get() = Url("https://login.microsoftonline.com/${provider.tenant.value}/oauth2/v2.0/authorize")
 }

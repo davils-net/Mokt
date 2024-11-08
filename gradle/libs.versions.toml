@@ -11,6 +11,7 @@ android-browser = "1.8.0"
 datetime = "0.6.1"
 mordant = "3.0.1"
 slf4j = "2.0.16"
+atomicfu = "0.26.0"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -55,6 +56,7 @@ dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", vers
 android-library-gradle-plugin = { module = "com.android.library:com.android.library.gradle.plugin", version.ref = "android" }
 serialization-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 kotest-gradle-plugin = { module = "io.kotest:kotest-framework-multiplatform-plugin-gradle", version.ref = "kotest" }
+atomicfu-gradle-plugin = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicfu" }
 
 [bundles]
 build-src = [
@@ -63,5 +65,6 @@ build-src = [
     "dokka-gradle-plugin",
     "android-library-gradle-plugin",
     "serialization-gradle-plugin",
-    "kotest-gradle-plugin"
+    "kotest-gradle-plugin",
+    "atomicfu-gradle-plugin"
 ]

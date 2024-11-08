@@ -1,6 +1,6 @@
 /*
  * MIT License
- * Copyright 2024 Nils Jäkel
+ * Copyright 2024 Nils Jäkel  & David Ernst
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software”),
@@ -13,10 +13,9 @@
 
 package dev.redtronics.mokt.builder.device
 
-import dev.redtronics.mokt.Microsoft
 import dev.redtronics.mokt.MojangGameAuth
-import dev.redtronics.mokt.html.WebTheme
-import dev.redtronics.mokt.html.userCodePage
+import dev.redtronics.mokt.OAuth
+import dev.redtronics.mokt.Provider
 import dev.redtronics.mokt.network.interval
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.device.CodeErrorResponse
@@ -28,103 +27,73 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.cio.*
 import io.ktor.util.date.*
-import kotlinx.html.HTML
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Builder to configure the Microsoft device authentication flow.
+ * Base class for all device authentication.
  *
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public class DeviceBuilder internal constructor(override val provider: Microsoft) : MojangGameAuth<Microsoft>() {
+public abstract class DeviceAuth<out T : Provider> internal constructor() : OAuth, MojangGameAuth<T>() {
+    /**
+     * The local code redirect server to display the user code.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     private var codeServer: CIOApplicationEngine? = null
 
-    /**
-     * The URL to the Microsoft Device Code endpoint.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     */
-    public val deviceCodeEndpointUrl: Url
-        get() = Url("https://login.microsoftonline.com/${provider.tenant.value}/oauth2/v2.0/devicecode")
+    override val grantType: String = "urn:ietf:params:oauth:grant-type:device_code"
 
     /**
-     * The grant type of the Microsoft Device Code endpoint.
+     * Endpoint to request the device and user code.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public val grantType: String
-        get() = "urn:ietf:params:oauth:grant-type:device_code"
+    public abstract val deviceCodeEndpointUrl: Url
 
     /**
-     * Configures the user code handling.
+     * Displays the user code to the user.
      *
-     * @param userCode The user code to display.
-     * @param builder The builder to configure the output of the user code.
+     * @param deviceCodeResponse The device code response.
+     * @param builder The builder to configure the user code display.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun displayCode(userCode: String, builder: suspend UserCodeBuilder.() -> Unit) {
-        val userCodeBuilder = UserCodeBuilder(userCode).apply { builder() }
+    public suspend fun displayCode(deviceCodeResponse: DeviceCodeResponse, builder: suspend UserCodeBuilder.() -> Unit) {
+        val userCodeBuilder = UserCodeBuilder(deviceCodeResponse).apply { builder() }
         codeServer = userCodeBuilder.build()
     }
 
     /**
-     * Configures the user code handling.
+     * Requests the authorization code from the device code endpoint.
      *
-     * @param userCode The user code to display.
-     * @param displayMode The display mode of the user code.
-     * @param localServerUrl The URL to the local server.
-     * @param webPageTheme The theme of the web page.
-     * @param forceHttps Whether to force HTTPS.
-     * @param shouldDisplayCode Whether to display the user code in the browser.
-     * @param webPage The web page to display the user code.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public suspend fun displayCode(
-        userCode: String,
-        displayMode: DisplayMode,
-        localServerUrl: Url = Url("http://localhost:18769/usercode"),
-        webPageTheme: WebTheme = WebTheme.DARK,
-        forceHttps: Boolean = false,
-        shouldDisplayCode: Boolean = true,
-        webPage: HTML.(userCode: String) -> Unit = { code -> userCodePage(code, webPageTheme) }
-    ) {
-        displayCode(userCode) {
-            this.webPageTheme = webPageTheme
-            this.webPage = webPage
-            this.localServerUrl = localServerUrl
-            this.forceHttps = forceHttps
-            this.shouldDisplayCode = shouldDisplayCode
-
-            if (displayMode == DisplayMode.BROWSER) {
-                inBrowser()
-            }
-        }
-    }
-
-    /**
-     * Requests an authorization code from the Microsoft Device Code endpoint.
-     *
+     * @param additionalParameters The additional parameters to be appended to the request.
      * @param onRequestError The function to be called if an error occurs during the authorization code request.
-     * @return The [DeviceCodeResponse] of the authorization code request or null if an error occurs.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
     public suspend fun requestAuthorizationCode(
-        onRequestError: suspend (err: CodeErrorResponse) -> Unit = {},
+        additionalParameters: Map<String, String> = mapOf(),
+        onRequestError: suspend (err: CodeErrorResponse) -> Unit = {}
     ): DeviceCodeResponse? {
         val response = provider.httpClient.submitForm(
             url = deviceCodeEndpointUrl.toString(),
             formParameters = parameters {
-                append("client_id", provider.clientId!!)
+                append("client_id", provider.clientId)
                 append("scope", provider.scopes.joinToString(" ") { it.value })
+
+                if (provider.clientSecret != null) {
+                    append("client_secret", provider.clientSecret!!)
+                }
+
+                additionalParameters.forEach {
+                    append(it.key, it.value)
+                }
             }
         )
         if (!response.status.isSuccess()) {
@@ -135,48 +104,78 @@ public class DeviceBuilder internal constructor(override val provider: Microsoft
     }
 
     /**
-     * Requests an access token from the Microsoft Device Login endpoint.
+     * Requests the access token from the device code endpoint.
      *
-     * @param deviceCodeResponse The [DeviceCodeResponse] of the authorization code request.
+     * @param deviceCodeResponse The device code response.
+     * @param additionalParameters The additional parameters to be appended to the request.
      * @param onRequestError The function to be called if an error occurs during the access token request.
-     * @return The [AccessResponse] of the access token request or null if an error occurs.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
     public suspend fun requestAccessToken(
         deviceCodeResponse: DeviceCodeResponse,
+        additionalParameters: Map<String, String> = mapOf(),
         onRequestError: suspend (err: DeviceAuthStateError) -> Unit = {}
     ): AccessResponse? {
         val startTime = getTimeMillis()
-        return authLoop(startTime, deviceCodeResponse, onRequestError)
+        return authLoop(startTime, deviceCodeResponse, additionalParameters, onRequestError)
     }
 
     /**
-     * The loop to request an access token from the Microsoft Device Login endpoint.
+     * Requests the access token from the device code endpoint.
      *
-     * @param startTime The start time of the loop.
-     * @param deviceCodeResponse The [DeviceCodeResponse] of the authorization code request.
+     * @param deviceCodeResponse The device code response.
+     * @param additionalParameters The additional parameters to be appended to the request.
      * @param onRequestError The function to be called if an error occurs during the access token request.
-     * @return The [AccessResponse] of the access token request or null if an error occurs.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    private suspend fun authLoop(
+    public suspend fun requestAccessToken(
+        deviceCodeResponse: DeviceCodeResponse,
+        additionalParameters: Map<String, String> = mapOf(),
+        displayUserCode: suspend UserCodeBuilder.() -> Unit = {},
+        onRequestError: suspend (err: DeviceAuthStateError) -> Unit = {}
+    ): AccessResponse? {
+        displayCode(deviceCodeResponse, displayUserCode)
+        return requestAccessToken(deviceCodeResponse, additionalParameters, onRequestError)
+    }
+
+    /**
+     * Interval to poll for the access token from the device token endpoint.
+     *
+     * @param startTime The current start time.
+     * @param deviceCodeResponse The device code response.
+     * @param additionalParameters The additional parameters to be appended to the request.
+     * @param onRequestError The function to be called if an error occurs during the access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    internal suspend fun authLoop(
         startTime: Long,
         deviceCodeResponse: DeviceCodeResponse,
+        additionalParameters: Map<String, String>,
         onRequestError: suspend (err: DeviceAuthStateError) -> Unit
-    ) = interval(
+    ): AccessResponse? = interval(
         interval = deviceCodeResponse.interval.seconds,
         cond = { getTimeMillis() - startTime < deviceCodeResponse.expiresIn * 1000 }
     ) {
         val response = provider.httpClient.submitForm(
             url = provider.tokenEndpointUrl.toString(),
             formParameters = parameters {
-                append("client_id", provider.clientId!!)
+                append("client_id", provider.clientId)
                 append("device_code", deviceCodeResponse.deviceCode)
                 append("grant_type", grantType)
+
+                if (provider.clientSecret != null) {
+                    append("client_secret", provider.clientSecret!!)
+                }
+
+                additionalParameters.forEach {
+                    append(it.key, it.value)
+                }
             }
         )
 

@@ -30,6 +30,7 @@ public data class DeviceAuthStateError(
 @Serializable(DeviceAuthStateErrorItem.Serializer::class)
 public enum class DeviceAuthStateErrorItem(public val value: String) {
     AUTHORIZATION_PENDING("authorization_pending"),
+    SLOW_DOWN("slow_down"),
     INVALID_REQUEST("invalid_request"),
     AUTHORIZATION_DECLINED("authorization_declined"),
     BAD_VERIFICATION_CODE("bad_verification_code"),

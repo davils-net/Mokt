@@ -9,14 +9,23 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt
+package dev.redtronics.mokt.network
 
-import dev.redtronics.mokt.cinterop.open_url
+import dev.redtronics.mokt.OsType
+import dev.redtronics.mokt.os
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import java.awt.Desktop
 
 public actual suspend fun openInBrowser(url: Url): Unit = withContext(Dispatchers.IO) {
-    open_url(url.toString())
+    when(os) {
+        OsType.WINDOWS -> {
+            Desktop.getDesktop().browse(url.toURI())
+        }
+        else -> {
+            val process = ProcessBuilder("xdg-open", url.toString())
+            process.start()
+        }
+    }
 }

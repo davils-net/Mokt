@@ -1,6 +1,6 @@
 /*
  * MIT License
- * Copyright 2024 Nils Jäkel & David Ernst
+ * Copyright 2024 Nils Jäkel  & David Ernst
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software”),
@@ -9,13 +9,14 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt.builder
+package dev.redtronics.mokt
 
-import dev.redtronics.mokt.Authentik
-import dev.redtronics.mokt.MojangGameAuth
+import kotlin.random.Random
 
-public class AuthentikBuilder internal constructor(
-    override val provider: Authentik
-) : MojangGameAuth<Authentik>() {
-
+public fun generateRandomIdentifier(length: Int = 32): String {
+    val charPool = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+    return (1..length)
+        .map { Random.nextInt(0, charPool.size) }
+        .map(charPool::get)
+        .joinToString("")
 }

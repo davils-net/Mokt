@@ -9,112 +9,120 @@
  * and/or sell copies of the Software.
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package dev.redtronics.mokt
 
-import dev.redtronics.mokt.builder.device.DeviceBuilder
+import dev.redtronics.mokt.Tenant.*
+import dev.redtronics.mokt.builder.device.MicrosoftDeviceBuilder
 import dev.redtronics.mokt.builder.grant.GrantCodeBuilder
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
+import dev.redtronics.mokt.response.AccessResponse
 import io.ktor.client.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
 
 /**
  * Microsoft authentication provider.
- * Interacts with the Microsoft API via device authentication or oauth2.
+ * Interacts with the Microsoft API via device authentication or code grant flow.
  *
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public class Microsoft @PublishedApi internal constructor() : Provider {
-    override val name: String
-        get() = "Microsoft"
-
-    /**
-     * The http client used by the Microsoft provider.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    override var httpClient: HttpClient = client
-
-    /**
-     * The json used by the Microsoft provider.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    override var json: Json = defaultJson
-
+public class Microsoft internal constructor(
     /**
      * The client id for the Microsoft provider.
      * If the client id is not set, the provider will try to get the client id
-     * from the environment MS_CLIENT_ID.
+     * from the environment `MS_CLIENT_ID.`
      *
      * @throws IllegalArgumentException If the client id is not valid or null.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var clientId: String? = getEnv("MS_CLIENT_ID")
+    override val clientId: String,
 
     /**
-     * The [MSTenant] value in the path of the request URL can be used to control
-     * who can sign in to the application. For guest scenarios where you sign in a user from one tenant into another tenant,
-     * you must provide the tenant identifier to sign them into the target tenant.
+     * The client secret for the Microsoft provider.
+     * If the client secret is not set, the provider will try to get the client secret
+     * from the environment `MS_CLIENT_SECRET.`
+     *
+     * @throws IllegalArgumentException If the client secret is not valid or null.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var tenant: MSTenant = MSTenant.CONSUMERS
+    override val clientSecret: String?
+) : Provider() {
+    init {
+        val isClientIdValid = Regex("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}").matches(clientId)
+        if (!isClientIdValid) throw IllegalArgumentException("Client id is not valid")
+    }
+
+    override val name: String
+        get() = "Microsoft"
+
+    override var httpClient: HttpClient = client
+    override var json: Json = defaultJson
 
     /**
-     * The scopes of the Microsoft provider.
+     * The [Tenant] value in the path of the request URL can be used to control
+     * who can sign in to the application.
+     *
+     * For guest scenarios where you sign in a user from one tenant
+     * into another tenant, you must provide the tenant identifier to sign them into the target tenant.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var scopes: List<MSScope> = MSScope.allScopes
+    public var tenant: Tenant = CONSUMERS
 
     /**
-     * The url of the token endpoint.
+     * The url of the microsoft's token endpoint to get the access token.
+     * It would automatically resolve by on the [tenant] value.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public val tokenEndpointUrl: Url
+    override val tokenEndpointUrl: Url
         get() = Url("https://login.microsoftonline.com/${tenant.value}/oauth2/v2.0/token")
 
     /**
-     * Detects which authentication method is used.
-     * If no auth flow is started, this will be null.
+     * Uses microsoft's code grant flow.
      *
-     * @see MSAuthMethod
+     * The OAuth 2.0 authorization code grant, also known as the authorization code flow,
+     * enables a client application to obtain authorized access to protected resources,
+     * such as web APIs.
      *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public var authMethod: MSAuthMethod? = null
-        private set
-
-    /**
-     * Configuration for the OAuth 2.0 authentication flow.
+     * The authorization code flow requires a user agent that supports redirection from
+     * the authorization server (Microsoft Identity Platform) back to your application.
+     * This can be a web browser, a desktop application, or a mobile application that
+     * allows a user to sign in to your application and access their data.
      *
      * @param builder The builder to configure the OAuth 2.0 flow.
-     * @return The result of the builder [T].
+     * @return The last result of the builder [T].
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun <T> codeGrant(builder: suspend GrantCodeBuilder.() -> T): T {
-        authMethod = MSAuthMethod.OAUTH2
-        GrantCodeBuilder(this).apply { return builder() }
+    public suspend fun <T> grant(builder: suspend GrantCodeBuilder.() -> T): T {
+        val grantCodeBuilder = GrantCodeBuilder(this)
+        return builder(grantCodeBuilder)
     }
 
     /**
-     * Configuration for the device authentication flow.
+     * Uses microsoft's device authentication flow.
+     *
+     * The OAuth 2.0 device authorization grant is designed for Internet
+     * connected devices that either lack a browser to perform a user-agent-
+     * based authorization or are input constrained to the extent that
+     * requiring the user to input text in order to authenticate during the
+     * authorization flow is impractical.
+     *
+     * It enables OAuth clients on such
+     * devices (like smart TVs, media consoles, digital picture frames, and
+     * printers) to obtain user authorization to access protected resources
+     * by using a user agent on a separate device.
      *
      * @param builder The builder to configure the device flow.
      * @return The result of the builder [T].
@@ -122,106 +130,30 @@ public class Microsoft @PublishedApi internal constructor() : Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun <T> device(builder: suspend DeviceBuilder.() -> T): T {
-        authMethod = MSAuthMethod.DEVICE_AUTH
-        DeviceBuilder(this).apply { return builder() }
+    public suspend fun <T> device(builder: suspend MicrosoftDeviceBuilder.() -> T): T {
+        val deviceBuilder = MicrosoftDeviceBuilder(this)
+        return builder(deviceBuilder)
+    }
+
+    override suspend fun requestAccessTokenFromRefreshToken(
+        refreshToken: String,
+        onRequestError: suspend (response: HttpResponse) -> Unit
+    ): AccessResponse? {
+        TODO("Not yet implemented")
     }
 }
 
 /**
- * Defines the different authentication methods used by the Microsoft provider.
- *
- * @property authMethodName The name of the authentication method.
- *
- * @since 0.0.1
- * @author Nils Jäkel
- */
-public enum class MSAuthMethod(public val authMethodName: String) {
-    /**
-     * The OAuth 2.0 authentication method.
-     * */
-    OAUTH2("oauth2"),
-
-    /**
-     * The device authentication method.
-     * */
-    DEVICE_AUTH("device_auth");
-
-    public companion object {
-        /**
-         * Finds an [MSAuthMethod] by its name.
-         *
-         * @param name The name of the authentication method.
-         * @return The [MSAuthMethod] with the given name.
-         *
-         * @throws NoSuchElementException If no authentication method is found with the given name.
-         *
-         * @since 0.0.1
-         * @author Nils Jäkel
-         */
-        public fun byName(name: String): MSAuthMethod = entries.first { it.authMethodName == name }
-    }
-}
-
-/**
- * Defines the different tenants used by the Microsoft provider.
+ * The [Tenant] in the request path can be set to specify which users can sign in to the application.
+ * Valid identifiers are [COMMON], [ORGANIZATIONS], [CONSUMERS].
  *
  * @property value The name of the tenant.
  *
  * @since 0.0.1
  * @author Nils Jäkel
  */
-public enum class MSTenant(public val value: String) {
+public enum class Tenant(public val value: String) {
     CONSUMERS("consumers"),
     ORGANIZATIONS("organizations"),
     COMMON("common");
-
-    public companion object {
-        /**
-         * Finds an [MSTenant] by its name.
-         *
-         * @param name The name of the tenant.
-         * @return The [MSTenant] with the given name.
-         *
-         * @throws NoSuchElementException If no tenant is found with the given name.
-         *
-         * @since 0.0.1
-         * @author Nils Jäkel
-         */
-        public fun byName(name: String): MSTenant = entries.first { it.value == name }
-    }
-}
-
-/**
- * Defines the different auth scopes used by the Microsoft provider.
- *
- * @property value The name of the scope.
- *
- * @since 0.0.1
- * @author Nils Jäkel
- */
-public enum class MSScope(public val value: String) {
-    OPENID("openid"),
-    PROFILE("profile"),
-    EMAIL("email"),
-    OFFLINE_ACCESS("offline_access"),
-    XBOX_LIVE_SIGNIN("XBoxLive.signin");
-
-    public companion object {
-        /**
-         * Finds an [MSTenant] by its name.
-         *
-         * @param name The name of the tenant.
-         * @return The [MSTenant] with the given name.
-         *
-         * @throws NoSuchElementException If no tenant is found with the given name.
-         *
-         * @since 0.0.1
-         * @author Nils Jäkel
-         */
-        public fun byName(name: String): MSScope = entries.first { it.value == name }
-
-        public val allScopes: List<MSScope>
-            get() = entries.toList()
-    }
 }

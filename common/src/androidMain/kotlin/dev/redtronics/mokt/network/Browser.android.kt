@@ -9,7 +9,7 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt
+package dev.redtronics.mokt.network
 
 import android.content.Context
 import android.net.Uri

@@ -9,20 +9,18 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt.html
+package dev.redtronics.mokt.builder.mojang
 
-import kotlinx.html.HTML
-import kotlinx.html.body
-import kotlinx.html.p
+import io.ktor.client.*
+import kotlinx.serialization.json.Json
 
-public fun HTML.successPage() {
-    body {
-        p { text("Success!") }
-    }
-}
-
-public fun HTML.failurePage() {
-    body {
-        p { text("Failed!") }
-    }
+/**
+ * Base class for all mojang authentication builders.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
+public abstract class MinecraftAuthBuilder {
+    internal abstract val httpClient: HttpClient
+    internal abstract val json: Json
 }

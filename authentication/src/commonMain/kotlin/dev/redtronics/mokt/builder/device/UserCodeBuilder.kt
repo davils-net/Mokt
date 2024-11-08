@@ -15,28 +15,21 @@ package dev.redtronics.mokt.builder.device
 
 import dev.redtronics.mokt.html.WebTheme
 import dev.redtronics.mokt.html.userCodePage
-import dev.redtronics.mokt.openInBrowser
-import dev.redtronics.mokt.server.displayCodeRouting
+import dev.redtronics.mokt.network.openInBrowser
+import dev.redtronics.mokt.response.device.DeviceCodeResponse
+import dev.redtronics.mokt.server.userCodeRouting
 import io.ktor.http.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import kotlinx.html.HTML
 
-public class UserCodeBuilder internal constructor(
-    private val userCode: String
-) {
+public class UserCodeBuilder internal constructor(private val deviceCodeResponse: DeviceCodeResponse) {
     private var codeServer: CIOApplicationEngine? = null
 
-    public var localServerUrl: Url = Url("http://localhost:18769/usercode")
+    public val verificationUrl: Url
+        get() = Url(deviceCodeResponse.verificationUri)
 
-    /**
-     * The URL to the Microsoft Device Login endpoint.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     */
-    public val codeLoginEndpointUrl: Url
-        get() = Url("https://www.microsoft.com/link")
+    public var localServerUrl: Url = Url("http://localhost:18769/usercode")
 
     public var webPageTheme: WebTheme = WebTheme.DARK
 
@@ -49,14 +42,18 @@ public class UserCodeBuilder internal constructor(
     public suspend fun inBrowser() {
         codeServer = embeddedServer(CIO, localServerUrl.port, localServerUrl.host) {
             val path = localServerUrl.fullPath.ifBlank { "/" }
-            displayCodeRouting(userCode, path, webPage)
+            userCodeRouting(deviceCodeResponse.userCode, path, webPage)
         }
 
         codeServer!!.start()
         if (shouldDisplayCode) {
             openInBrowser(localServerUrl)
         }
-        openInBrowser(codeLoginEndpointUrl)
+        openInBrowser(verificationUrl)
+    }
+
+    public suspend fun inTerminal() {
+
     }
 
     internal fun build(): CIOApplicationEngine? = codeServer

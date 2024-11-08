@@ -48,3 +48,10 @@ kotlin {
         }
     }
 }
+
+buildConstants {
+    properties = mapOf(
+        "MOKT_LOGO_URL" to "https://code.redtronics.dev/nils.jaekel/mokt/-/raw/master/assets/mokt_m_alpha.png?ref_type=heads",
+        "MOKT_DEVICE_CODE_BACKGROUND" to "https://code.redtronics.dev/nils.jaekel/mokt/-/raw/feat/grant-auth/assets/background.png"
+    )
+}
