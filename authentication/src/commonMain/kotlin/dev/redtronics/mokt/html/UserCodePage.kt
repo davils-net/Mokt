@@ -102,3 +102,15 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
         }
     }
 }
+
+/**
+ * Represents the theme of the user code page.
+ * Dark or Light Mode
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
+public enum class WebTheme {
+    LIGHT,
+    DARK;
+}
