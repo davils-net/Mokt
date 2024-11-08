@@ -55,12 +55,24 @@ internal fun GradleProject.generateCInteropDefFiles() {
             defFile.createNewFile()
         }
 
-        defFile.writeText("""
-            headers = $hFiles
-            staticLibraries = libmokt_rust_bindings.a
-            compilerOpts = -I$includeDir
-            libraryPaths = ${rustBindingsDir.resolve("target/release")}
-        """.trimIndent())
+        when(os) {
+            OsType.WINDOWS -> {
+                defFile.writeText("""
+                    headers = $hFiles
+                    staticLibraries = ${Project.NAME.lowercase()}_rust_bindings.lib
+                    compilerOpts = -I${includeDir.absolutePath.replace("\\", "/")}
+                    libraryPaths = ${rustBindingsDir.resolve("target/release").absolutePath.replace("\\", "/")}
+                """.trimIndent())
+            }
+            else -> {
+                defFile.writeText("""
+                    headers = $hFiles
+                    staticLibraries = libmokt_rust_bindings.a
+                    compilerOpts = -I$includeDir
+                    libraryPaths = ${rustBindingsDir.resolve("target/release")}
+                """.trimIndent())
+            }
+        }
     }
 }
 
