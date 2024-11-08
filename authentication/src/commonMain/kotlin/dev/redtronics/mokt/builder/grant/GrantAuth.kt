@@ -14,8 +14,7 @@
 package dev.redtronics.mokt.builder.grant
 
 import dev.redtronics.mokt.*
-import dev.redtronics.mokt.html.failurePage
-import dev.redtronics.mokt.html.successPage
+import dev.redtronics.mokt.html.redirectPage
 import dev.redtronics.mokt.network.openInBrowser
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.GrantCodeResponse
@@ -72,7 +71,13 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var successRedirectPage: HTML.() -> Unit = { successPage() }
+    public var successRedirectPage: HTML.() -> Unit = { redirectPage(
+        "#ffffff",
+        "#009320",
+        "#bcff00",
+        "Authentication successful",
+        "You can close this page now!"
+    ) }
 
     /**
      * The page that will be shown after a failed authorization.
@@ -80,7 +85,13 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var failureRedirectPage: HTML.() -> Unit = { failurePage() }
+    public var failureRedirectPage: HTML.() -> Unit = { redirectPage(
+        "#ffffff",
+        "#b20000",
+        "#ff0000",
+        "Authentication failed",
+        "Please try again!"
+    ) }
 
     public suspend fun requestGrantCode(
         browser: suspend (url: Url) -> Unit = { url -> openInBrowser(url) },
@@ -100,7 +111,7 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
             host = authorizeEndpointUrl.host
             path(authorizeEndpointUrl.fullPath)
             parameters.apply {
-                append("client_id", provider.clientId!!)
+                append("client_id", provider.clientId)
                 append("response_type", responseType.value)
                 append("redirect_uri", localRedirectUrl.toString())
                 append("response_mode", responseMode.value)
@@ -124,7 +135,7 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
         val response = provider.httpClient.submitForm(
             url = provider.tokenEndpointUrl.toString(),
             parameters {
-                append("client_id", provider.clientId!!)
+                append("client_id", provider.clientId)
                 append("scope", provider.scopes.joinToString(" ") { it.value })
                 append("code", grantCode.code)
                 append("redirect_uri", localRedirectUrl.toString())
