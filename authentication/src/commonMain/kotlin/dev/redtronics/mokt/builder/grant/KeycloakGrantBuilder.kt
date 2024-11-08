@@ -17,5 +17,5 @@ import io.ktor.http.*
 
 public class KeycloakGrantBuilder internal constructor(override val provider: Keycloak) : GrantAuth<Keycloak>() {
     override val authorizeEndpointUrl: Url
-        get() = provider.instanceUrl!! / "/realms/${provider.realm!!}/protocol/openid-connect/auth"
+        get() = provider.instanceUrl / "/realms/${provider.realm}/protocol/openid-connect/auth"
 }
