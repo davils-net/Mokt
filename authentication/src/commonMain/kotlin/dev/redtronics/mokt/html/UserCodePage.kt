@@ -104,8 +104,7 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
 }
 
 /**
- * Represents the theme of the user code page.
- * Dark or Light Mode
+ * Represents the theme of the user code page. (Dark/Light)
  *
  * @since 0.0.1
  * @author Nils Jäkel
