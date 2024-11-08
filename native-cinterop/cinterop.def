@@ -1,0 +1,4 @@
+headers = mokt.h
+staticLibraries = libmokt_rust_bindings.a
+compilerOpts = -I/Users/larsultsch/IdeaProjects/mokt/mokt-rust-bindings/include
+libraryPaths = /Users/larsultsch/IdeaProjects/mokt/mokt-rust-bindings/target/release

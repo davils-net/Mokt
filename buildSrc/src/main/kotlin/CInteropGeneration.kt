@@ -9,17 +9,11 @@
  * and/or sell copies of the Software.
  */
 
+import org.gradle.api.NamedDomainObjectCollection
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.gradle.api.Project as GradleProject
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
 import java.nio.file.Path
-
-/**
- * The architectures for which cinterop def files should be generated.
- *
- * @since 0.0.1
- * @author Nils Jäkel
- */
-private val architectures = listOf("aarch64-unknown-linux-gnu", "x86_64-pc-windows-gnu")
 
 /**
  * Compiles the C++ bindings for the cinterop.
@@ -49,32 +43,36 @@ internal fun GradleProject.generateCInteropDefFiles() {
 
     val hFiles = includeDir.list()?.joinToString(" ") ?: throw Exception("No include files found")
 
-    architectures.forEach { arch ->
-        val defFile = nativeCInteropDir.resolve("$arch.def")
-        if (!defFile.exists()) {
-            defFile.createNewFile()
-        }
+    val defFile = nativeCInteropDir.resolve("cinterop.def")
+    if (!defFile.exists()) {
+        defFile.createNewFile()
+    }
 
-        when(os) {
-            OsType.WINDOWS -> {
-                defFile.writeText("""
+    when (os) {
+        OsType.WINDOWS -> {
+            defFile.writeText(
+                """
                     headers = $hFiles
                     staticLibraries = ${Project.NAME.lowercase()}_rust_bindings.lib
                     compilerOpts = -I${includeDir.absolutePath.replace("\\", "/")}
                     libraryPaths = ${rustBindingsDir.resolve("target/release").absolutePath.replace("\\", "/")}
-                """.trimIndent())
-            }
-            else -> {
-                defFile.writeText("""
+                """.trimIndent()
+            )
+        }
+
+        else -> {
+            defFile.writeText(
+                """
                     headers = $hFiles
                     staticLibraries = libmokt_rust_bindings.a
                     compilerOpts = -I$includeDir
                     libraryPaths = ${rustBindingsDir.resolve("target/release")}
-                """.trimIndent())
-            }
+                """.trimIndent()
+            )
         }
     }
 }
+
 
 /**
  * Applies the cinterop generation for the given [architectures] to the given [KotlinNativeTargetWithHostTests].
@@ -83,6 +81,17 @@ internal fun GradleProject.generateCInteropDefFiles() {
  * @author Nils Jäkel
  */
 fun KotlinNativeTargetWithHostTests.applyCInteropGeneration(path: Path) {
+    compilations.getByName("main") {
+        cinterops {
+            create("moktRustBindings") {
+                defFile(path)
+                packageName("${Project.GROUP}.cinterop")
+            }
+        }
+    }
+}
+
+fun KotlinNativeTarget.applyCInteropGeneration(path: Path) {
     compilations.getByName("main") {
         cinterops {
             create("moktRustBindings") {
