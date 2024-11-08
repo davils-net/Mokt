@@ -31,5 +31,5 @@ public class KeycloakDeviceBuilder internal constructor(override val provider: K
      * @author Nils Jäkel
      * */
     override val deviceCodeEndpointUrl: Url
-        get() = provider.instanceUrl!! / "/realms/${provider.realm!!}/protocol/openid-connect/auth/device"
+        get() = provider.instanceUrl / "/realms/${provider.realm}/protocol/openid-connect/auth/device"
 }

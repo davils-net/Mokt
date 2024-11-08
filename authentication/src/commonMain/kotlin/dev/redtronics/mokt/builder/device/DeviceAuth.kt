@@ -84,7 +84,7 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
         val response = provider.httpClient.submitForm(
             url = deviceCodeEndpointUrl.toString(),
             formParameters = parameters {
-                append("client_id", provider.clientId!!)
+                append("client_id", provider.clientId)
                 append("scope", provider.scopes.joinToString(" ") { it.value })
 
                 if (provider.clientSecret != null) {
@@ -165,7 +165,7 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
         val response = provider.httpClient.submitForm(
             url = provider.tokenEndpointUrl.toString(),
             formParameters = parameters {
-                append("client_id", provider.clientId!!)
+                append("client_id", provider.clientId)
                 append("device_code", deviceCodeResponse.deviceCode)
                 append("grant_type", grantType)
 

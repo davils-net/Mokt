@@ -66,7 +66,7 @@ public abstract class Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public abstract var clientId: String?
+    public abstract val clientId: String
 
     /**
      * The client secret of the authentication provider.
@@ -74,7 +74,7 @@ public abstract class Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public abstract var clientSecret: String?
+    public abstract val clientSecret: String?
 
     /**
      * The scopes there are used to get the access token.
@@ -99,14 +99,6 @@ public abstract class Provider {
         refreshToken: String,
         onRequestError: suspend (response: HttpResponse) -> Unit = {}
     ): AccessResponse?
-
-    /**
-     * Builds and validates the configuration of the auth provider.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    internal abstract suspend fun build()
 }
 
 /**
@@ -119,10 +111,11 @@ public abstract class Provider {
  * @since 0.0.1
  * @author Nils Jäkel
  */
-public suspend fun microsoftAuth(builder: suspend Microsoft.() -> Unit): Microsoft {
-    val microsoft = Microsoft().apply { builder() }
-    return microsoft
-}
+public suspend fun microsoftAuth(
+    clientId: String,
+    clientSecret: String? = getEnv("MICROSOFT_CLIENT_SECRET"),
+    builder: suspend Microsoft.() -> Unit
+): Microsoft = Microsoft(clientId, clientSecret).apply { builder() }
 
 /**
  * Central adapter to communicate with the Microsoft authentication provider.
@@ -147,9 +140,7 @@ public suspend fun microsoftAuth(
     tenant: Tenant = Tenant.CONSUMERS,
     httpClient: HttpClient = client,
     json: Json = defaultJson
-): Microsoft = microsoftAuth {
-    this.clientId = clientId
-    this.clientSecret = clientSecret
+): Microsoft = microsoftAuth(clientId, clientSecret) {
     this.tenant = tenant
     this.httpClient = httpClient
     this.json = json
@@ -165,10 +156,13 @@ public suspend fun microsoftAuth(
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public suspend fun keycloakAuth(builder: suspend Keycloak.() -> Unit): Keycloak {
-    val keycloak = Keycloak().apply { builder() }
-    return keycloak
-}
+public suspend fun keycloakAuth(
+    clientId: String,
+    clientSecret: String? = getEnv("KEYCLOAK_CLIENT_SECRET"),
+    realm: String,
+    instanceUrl: Url,
+    builder: suspend Keycloak.() -> Unit
+): Keycloak = Keycloak(clientId, clientSecret, realm, instanceUrl).apply { builder() }
 
 /**
  * Central adapter to communicate with the Keycloak authentication provider.
@@ -193,11 +187,7 @@ public suspend fun keycloakAuth(
     clientSecret: String? = null,
     httpClient: HttpClient = client,
     json: Json = defaultJson
-): Keycloak = keycloakAuth {
-    this.clientId = clientId
-    this.clientSecret = clientSecret
-    this.instanceUrl = instanceUrl
-    this.realm = realm
+): Keycloak = keycloakAuth(clientId, clientSecret, realm, instanceUrl) {
     this.httpClient = httpClient
     this.json = json
 }

@@ -29,13 +29,7 @@ import kotlinx.serialization.json.Json
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public class Microsoft internal constructor() : Provider() {
-    override val name: String
-        get() = "Microsoft"
-
-    override var httpClient: HttpClient = client
-    override var json: Json = defaultJson
-
+public class Microsoft internal constructor(
     /**
      * The client id for the Microsoft provider.
      * If the client id is not set, the provider will try to get the client id
@@ -46,7 +40,30 @@ public class Microsoft internal constructor() : Provider() {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    override var clientId: String? = getEnv("MS_CLIENT_ID")
+    override val clientId: String,
+
+    /**
+     * The client secret for the Microsoft provider.
+     * If the client secret is not set, the provider will try to get the client secret
+     * from the environment `MS_CLIENT_SECRET.`
+     *
+     * @throws IllegalArgumentException If the client secret is not valid or null.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    override val clientSecret: String?
+) : Provider() {
+    init {
+        val isClientIdValid = Regex("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}").matches(clientId)
+        if (!isClientIdValid) throw IllegalArgumentException("Client id is not valid")
+    }
+
+    override val name: String
+        get() = "Microsoft"
+
+    override var httpClient: HttpClient = client
+    override var json: Json = defaultJson
 
     /**
      * The [Tenant] value in the path of the request URL can be used to control
@@ -71,18 +88,6 @@ public class Microsoft internal constructor() : Provider() {
         get() = Url("https://login.microsoftonline.com/${tenant.value}/oauth2/v2.0/token")
 
     /**
-     * The client secret for the Microsoft provider.
-     * If the client secret is not set, the provider will try to get the client secret
-     * from the environment `MS_CLIENT_SECRET.`
-     *
-     * @throws IllegalArgumentException If the client secret is not valid or null.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    override var clientSecret: String? = getEnv("KEYCLOAK_CLIENT_SECRET")
-
-    /**
      * Uses microsoft's code grant flow.
      *
      * The OAuth 2.0 authorization code grant, also known as the authorization code flow,
@@ -102,7 +107,7 @@ public class Microsoft internal constructor() : Provider() {
      * */
     public suspend fun <T> grant(builder: suspend GrantCodeBuilder.() -> T): T {
         val grantCodeBuilder = GrantCodeBuilder(this)
-        return builder(grantCodeBuilder).apply { build() }
+        return builder(grantCodeBuilder)
     }
 
     /**
@@ -127,7 +132,7 @@ public class Microsoft internal constructor() : Provider() {
      * */
     public suspend fun <T> device(builder: suspend MicrosoftDeviceBuilder.() -> T): T {
         val deviceBuilder = MicrosoftDeviceBuilder(this)
-        return builder(deviceBuilder).apply { build() }
+        return builder(deviceBuilder)
     }
 
     override suspend fun requestAccessTokenFromRefreshToken(
@@ -135,20 +140,6 @@ public class Microsoft internal constructor() : Provider() {
         onRequestError: suspend (response: HttpResponse) -> Unit
     ): AccessResponse? {
         TODO("Not yet implemented")
-    }
-
-    /**
-     * Checks if the client id is valid.
-     *
-     * @throws IllegalArgumentException If the client id is not valid.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    override suspend fun build() {
-        require(clientId != null) { "Client id is not set" }
-        val isClientIdValid = Regex("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}").matches(clientId!!)
-        if (!isClientIdValid) throw IllegalArgumentException("Client id is not valid")
     }
 }
 

@@ -32,13 +32,7 @@ import kotlinx.serialization.json.Json
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public class Keycloak internal constructor() : Provider() {
-    override val name: String
-        get() = "Keycloak"
-
-    override var httpClient: HttpClient = client
-    override var json: Json = defaultJson
-
+public class Keycloak internal constructor(
     /**
      * The client id for the Keycloak provider.
      * If the client id is not set, the provider will try to get the client id
@@ -49,7 +43,7 @@ public class Keycloak internal constructor() : Provider() {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    override var clientId: String? = getEnv("KEYCLOAK_CLIENT_ID")
+    override var clientId: String,
 
     /**
      * The client secret for the Keycloak provider.
@@ -59,7 +53,17 @@ public class Keycloak internal constructor() : Provider() {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    override var clientSecret: String? = getEnv("KEYCLOAK_CLIENT_SECRET")
+    override var clientSecret: String?,
+
+    /**
+     * The realm of the keycloak instance
+     *
+     * @throws IllegalArgumentException If the realm is not valid or not set.
+     *
+     * @since 0.0.1
+     * @author
+     * */
+    public val realm: String,
 
     /**
      * The base url of the keycloak instance.
@@ -71,19 +75,15 @@ public class Keycloak internal constructor() : Provider() {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var instanceUrl: Url? = getEnv("KEYCLOAK_INSTANCE_URL")?.let { Url(it) }
+    public val instanceUrl: Url
+) : Provider() {
+    override val name: String
+        get() = "Keycloak"
+
+    override var httpClient: HttpClient = client
+    override var json: Json = defaultJson
 
     /**
-     * The realm of the keycloak instance
-     *
-     * @throws IllegalArgumentException If the realm is not valid or not set.
-     *
-     * @since 0.0.1
-     * @author
-     * */
-    public var realm: String? = null
-
-     /**
      * The url of the microsoft's token endpoint to get the access token.
      * It would automatically resolve by on the [realm] value.
      *
@@ -91,7 +91,7 @@ public class Keycloak internal constructor() : Provider() {
      * @author Nils Jäkel
      * */
     override val tokenEndpointUrl: Url
-        get() = instanceUrl!! / "/realms/$realm/protocol/openid-connect/token"
+        get() = instanceUrl / "/realms/$realm/protocol/openid-connect/token"
 
     /**
      * The url of the keycloak's token endpoint to get the microsoft access token.
@@ -100,7 +100,7 @@ public class Keycloak internal constructor() : Provider() {
      * @author Nils Jäkel
      * */
     public val keycloakMsTokenEndpoint: Url
-        get() = instanceUrl!! / "/realms/$realm/broker/microsoft/token"
+        get() = instanceUrl / "/realms/$realm/broker/microsoft/token"
 
     /**
      * Uses keycloak's device authentication flow.
@@ -124,12 +124,12 @@ public class Keycloak internal constructor() : Provider() {
      * */
     public suspend fun <T> device(builder: suspend KeycloakDeviceBuilder.() -> T): T {
         val keycloakBuilder = KeycloakDeviceBuilder(this)
-        return builder(keycloakBuilder).apply { build() }
+        return builder(keycloakBuilder)
     }
 
     public suspend fun <T> grant(builder: suspend KeycloakGrantBuilder.() -> T): T {
         val keycloakBuilder = KeycloakGrantBuilder(this)
-        return builder(keycloakBuilder).apply { build() }
+        return builder(keycloakBuilder)
     }
 
     /**
@@ -143,7 +143,7 @@ public class Keycloak internal constructor() : Provider() {
      * */
     public suspend fun requestMicrosoftAccessToken(
         accessResponse: AccessResponse,
-        onRequestError: suspend (response: HttpResponse) -> Unit = {}
+        onRequestError: suspend (response: HttpResponse) -> Unit = {},
     ): AccessResponse? {
         val response = httpClient.get(keycloakMsTokenEndpoint) {
             headers {
@@ -171,15 +171,5 @@ public class Keycloak internal constructor() : Provider() {
         onRequestError: suspend (response: HttpResponse) -> Unit,
     ): AccessResponse? {
         TODO("Not yet implemented")
-    }
-
-    /**
-     * Validates the configuration of the auth provider.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    override suspend fun build() {
-        require(clientId != null && realm != null && instanceUrl != null) { "You need to set client id, realm and instance url" }
     }
 }
