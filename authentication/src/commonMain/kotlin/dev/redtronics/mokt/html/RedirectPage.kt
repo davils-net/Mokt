@@ -13,12 +13,24 @@ package dev.redtronics.mokt.html
 
 import kotlinx.html.*
 
+/**
+ * Simple page to display information as website on redirect.
+ *
+ * @param textColor The text color to be used.
+ * @param firstAccentColor The first accent color to be used.
+ * @param secondAccentColor The second accent color to be used.
+ * @param title The title of the page.
+ * @param notice The notice to be displayed.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public fun HTML.redirectPage(
     textColor: String,
     firstAccentColor: String,
     secondAccentColor: String,
     title: String,
-    notice: String,
+    notice: String
 ) {
     head {
         title(title)
