@@ -42,6 +42,22 @@ kotlin {
         applyCInteropGeneration(Path("../native-cinterop/x86_64-pc-windows-gnu.def"))
     }
 
+    macosX64()
+    macosArm64()
+
+    iosArm64()
+    iosX64()
+    iosSimulatorArm64()
+
+    watchosArm32()
+    watchosArm64()
+    watchosX64()
+    watchosSimulatorArm64()
+
+    tvosArm64()
+    tvosX64()
+    tvosSimulatorArm64()
+
     sourceSets {
         commonMain {
             dependencies {
@@ -107,6 +123,30 @@ kotlin {
                 api(libs.kotlinx.coroutines.android)
                 api(libs.ktor.client.android)
                 implementation(libs.androidx.browser)
+            }
+        }
+
+        iosMain {
+            dependencies {
+                api(libs.ktor.client.darwin)
+            }
+        }
+
+        macosMain {
+            dependencies {
+                api(libs.ktor.client.darwin)
+            }
+        }
+
+        tvosMain {
+            dependencies {
+                api(libs.ktor.client.darwin)
+            }
+        }
+
+        watchosMain {
+            dependencies {
+                api(libs.ktor.client.darwin)
             }
         }
 
