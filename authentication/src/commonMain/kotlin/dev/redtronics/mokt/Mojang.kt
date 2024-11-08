@@ -27,7 +27,7 @@ import io.ktor.client.statement.*
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public abstract class MojangGameAuth<out T : Provider> {
+public abstract class MojangGameAuth<out T : Provider> internal constructor() {
     /**
      * The provider that is inherited from [MojangGameAuth].
      *

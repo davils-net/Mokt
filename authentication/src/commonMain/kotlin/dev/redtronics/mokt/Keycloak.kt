@@ -127,6 +127,24 @@ public class Keycloak internal constructor(
         return builder(keycloakBuilder)
     }
 
+    /**
+     * Uses keycloak's code grant flow.
+     *
+     * The OAuth 2.0 authorization code grant, also known as the authorization code flow,
+     * enables a client application to obtain authorized access to protected resources,
+     * such as web APIs.
+     *
+     * The authorization code flow requires a user agent that supports redirection from
+     * the authorization server (Keycloak Instance) back to your application.
+     * This can be a web browser, a desktop application, or a mobile application that
+     * allows a user to sign in to your application and access their data.
+     *
+     * @param builder The builder to configure the OAuth 2.0 flow.
+     * @return The last result of the builder [T].
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public suspend fun <T> grant(builder: suspend KeycloakGrantBuilder.() -> T): T {
         val keycloakBuilder = KeycloakGrantBuilder(this)
         return builder(keycloakBuilder)

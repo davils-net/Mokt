@@ -20,6 +20,16 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
+/**
+ * Represents the errors that can be returned by the auth loop from the device
+ * flow while the user is authorizing.
+ *
+ * @property error The error from the auth loop.
+ * @property errorDescription The description of the error.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 @Serializable
 public data class DeviceAuthStateError(
     val error: DeviceAuthStateErrorItem,
@@ -27,6 +37,13 @@ public data class DeviceAuthStateError(
     val errorDescription: String
 )
 
+/**
+ * Represents the error items that can be returned by the auth loop from the device
+ * flow while the user is authorizing.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 @Serializable(DeviceAuthStateErrorItem.Serializer::class)
 public enum class DeviceAuthStateErrorItem(public val value: String) {
     AUTHORIZATION_PENDING("authorization_pending"),
@@ -44,10 +61,27 @@ public enum class DeviceAuthStateErrorItem(public val value: String) {
     }
 
     public companion object {
+        /**
+         * Returns the [DeviceAuthStateErrorItem] by its name.
+         *
+         * @param name The name of the error.
+         *
+         * @since 0.0.1
+         * @author Nils Jäkel
+         * */
         public fun byName(name: String): DeviceAuthStateErrorItem = entries.firstOrNull { it.value == name } ?: INVALID_REQUEST
     }
 }
 
+/**
+ * Represents the errors that can be returned by requesting the user and device code.
+ *
+ * @property error The error from the request.
+ * @property errorDescription The description of the error.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 @Serializable
 public data class CodeErrorResponse(
     public val error: CodeError,
@@ -55,6 +89,12 @@ public data class CodeErrorResponse(
     public val errorDescription: String
 )
 
+/**
+ * All possible errors that can be returned by requesting the user and device code.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 @Serializable(with = CodeError.Serializer::class)
 public enum class CodeError(public val value: String) {
     INVALID_REQUEST("invalid_request"),
@@ -75,6 +115,14 @@ public enum class CodeError(public val value: String) {
     }
 
     public companion object {
+        /**
+         * Returns the [CodeError] by its name.
+         *
+         * @param name The name of the error.
+         *
+         * @since 0.0.1
+         * @author Nils Jäkel
+         * */
         public fun byName(name: String): CodeError = entries.firstOrNull { it.value == name } ?: INVALID_REQUEST
     }
 }

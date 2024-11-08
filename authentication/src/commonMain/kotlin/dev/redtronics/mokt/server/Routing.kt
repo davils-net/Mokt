@@ -22,7 +22,14 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.html.HTML
 
 /**
- * Module for routing the oauth local redirect.
+ * Routing module for the ktor server to handle the redirect from the grant authentication flow by any
+ * provider.
+ *
+ * @param redirectPath The path to be routed to. E.g. "/callback"
+ * @param channel The coroutine channel to send the grant code response to.
+ * @param successPage The success page to be displayed if the request was successful.
+ * @param failurePage The failure page to be displayed if the request was not successful.
+ * @param onRequestError The function to be called if an error occurs during the request.
  *
  * @since 0.0.1
  * @author Nils Jäkel
@@ -32,7 +39,7 @@ internal fun Application.grantRouting(
     channel: Channel<GrantCodeResponse>,
     successPage: HTML.() -> Unit,
     failurePage: HTML.() -> Unit,
-    onRequestError: suspend (err: CodeErrorResponse) -> Unit,
+    onRequestError: suspend (err: CodeErrorResponse) -> Unit
 ) {
     routing {
         get(redirectPath) {
@@ -61,7 +68,7 @@ internal fun Application.grantRouting(
 }
 
 /**
- * Module for routing the user code display page.
+ * Routing module for the ktor server to display the device code in the browser.
  *
  * @param userCode The user code to be displayed.
  * @param displayPath The path to be routed to.
@@ -73,7 +80,7 @@ internal fun Application.grantRouting(
 internal fun Application.userCodeRouting(
     userCode: String,
     displayPath: String,
-    userCodePage: HTML.(userCode: String) -> Unit,
+    userCodePage: HTML.(userCode: String) -> Unit
 ) {
     routing {
         get(displayPath) {

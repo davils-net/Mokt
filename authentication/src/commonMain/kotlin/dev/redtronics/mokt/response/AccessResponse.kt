@@ -14,6 +14,19 @@ package dev.redtronics.mokt.response
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the access token response from the oauth2.0 standard.
+ *
+ * @property tokenType The type of the access token.
+ * @property scope The scope of the access token.
+ * @property expiresIn The expiration time of the access token.
+ * @property extExpiresIn The expiration time of the access token.
+ * @property accessToken The access token.
+ * @property refreshToken The refresh token.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 @Serializable
 public data class AccessResponse(
     @SerialName("token_type")

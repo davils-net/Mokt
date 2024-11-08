@@ -9,11 +9,31 @@
  * and/or sell copies of the Software.
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package dev.redtronics.mokt
 
+/**
+ * Base interface for all authentication flows.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public interface OAuth {
+    /**
+     * OAuth 2.0 Grant Type
+     *
+     * A grant type is the method by which an application requests an access token.
+     * OAuth 2.0 defines several standard grant types, including:
+     *
+     * * Authorization Code Flow: Used for web applications.
+     * * Client Credentials Flow: Used for server-to-server communication.
+     * * Refresh Token Flow: Used for obtaining a new access token using a refresh token.
+     * * Password Flow: Used for obtaining an access token using a username and password.
+     *
+     * Each grant type is optimized for a specific use case, such as web apps, native apps, devices without a web browser, or server-to-server applications.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     */
     public val grantType: String
 }
 

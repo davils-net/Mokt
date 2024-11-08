@@ -9,8 +9,6 @@
  * and/or sell copies of the Software.
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package dev.redtronics.mokt
 
 import dev.redtronics.mokt.network.client
@@ -105,6 +103,8 @@ public abstract class Provider {
  * Central adapter to communicate with the Microsoft authentication provider.
  * It creates an instance of [Microsoft] and configures it with the provided builder.
  *
+ * @param clientId The client id of the authentication provider.
+ * @param clientSecret The client secret of the authentication provider. If null, the client secret is try to get from the environment `MICROSOFT_CLIENT_SECRET`.
  * @param builder The builder to configure the [Microsoft] instance.
  * @return The initialized and configured [Microsoft] instance.
  *
@@ -150,6 +150,8 @@ public suspend fun microsoftAuth(
  * Central adapter to communicate with the Keycloak authentication provider.
  * It creates an instance of [Keycloak] and configures it with the provided builder.
  *
+ * @param clientId The client id of the authentication provider.
+ * @param clientSecret The client secret of the authentication provider. If null, the client secret is try to get from the environment `KEYCLOAK_CLIENT_SECRET`.
  * @param builder The builder to configure the [Keycloak] instance.
  * @return The initialized and configured [Keycloak] instance.
  *
