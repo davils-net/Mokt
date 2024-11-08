@@ -9,7 +9,6 @@
  * and/or sell copies of the Software.
  */
 
-import org.gradle.api.NamedDomainObjectCollection
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.gradle.api.Project as GradleProject
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests

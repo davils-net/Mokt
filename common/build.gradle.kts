@@ -33,30 +33,55 @@ kotlin {
         useEsModules()
         binaries.library()
     }
-
+    
+    val nativeDefFilePath = Path("../native-cinterop/cinterop.def")
     linuxX64 {
-        applyCInteropGeneration(Path("../native-cinterop/aarch64-unknown-linux-gnu.def"))
+        applyCInteropGeneration(nativeDefFilePath)
     }
 
     mingwX64 {
-        applyCInteropGeneration(Path("../native-cinterop/x86_64-pc-windows-gnu.def"))
+        applyCInteropGeneration(nativeDefFilePath)
+    }
+    
+    macosX64 {
+        applyCInteropGeneration(nativeDefFilePath)
+    }
+    macosArm64 {
+        applyCInteropGeneration(nativeDefFilePath)
     }
 
-    macosX64()
-    macosArm64()
+    iosArm64 {
+        applyCInteropGeneration(nativeDefFilePath)
+    }
+    iosX64 {
+        applyCInteropGeneration(nativeDefFilePath)
+    }
+    iosSimulatorArm64 {
+        applyCInteropGeneration(nativeDefFilePath)
+    }
 
-    iosArm64()
-    iosX64()
-    iosSimulatorArm64()
+    watchosArm32 {
+        applyCInteropGeneration(nativeDefFilePath)
+    }
+    watchosArm64 {
+        applyCInteropGeneration(nativeDefFilePath)
+    }
+    watchosX64 {
+        applyCInteropGeneration(nativeDefFilePath)
+    }
+    watchosSimulatorArm64 {
+        applyCInteropGeneration(nativeDefFilePath)
+    }
 
-    watchosArm32()
-    watchosArm64()
-    watchosX64()
-    watchosSimulatorArm64()
-
-    tvosArm64()
-    tvosX64()
-    tvosSimulatorArm64()
+    tvosArm64 {
+        applyCInteropGeneration(nativeDefFilePath)
+    }
+    tvosX64 {
+        applyCInteropGeneration(nativeDefFilePath)
+    }
+    tvosSimulatorArm64 {
+        applyCInteropGeneration(nativeDefFilePath)
+    }
 
     sourceSets {
         commonMain {
@@ -152,11 +177,11 @@ kotlin {
 
         all {
             languageSettings {
-               optIn("kotlinx.cinterop.UnsafeNumber")
-               optIn("kotlinx.cinterop.ExperimentalForeignApi")
-               optIn("kotlin.experimental.ExperimentalNativeApi")
-               optIn("kotlin.native.runtime.NativeRuntimeApi")
-               optIn("kotlin.ExperimentalStdlibApi")
+                optIn("kotlinx.cinterop.UnsafeNumber")
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                optIn("kotlin.experimental.ExperimentalNativeApi")
+                optIn("kotlin.native.runtime.NativeRuntimeApi")
+                optIn("kotlin.ExperimentalStdlibApi")
             }
         }
     }
