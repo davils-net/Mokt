@@ -11,9 +11,9 @@
 
 package dev.redtronics.mokt.server
 
+import dev.redtronics.mokt.response.GrantCodeResponse
 import dev.redtronics.mokt.response.device.CodeError
 import dev.redtronics.mokt.response.device.CodeErrorResponse
-import dev.redtronics.mokt.response.GrantCodeResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.html.*
@@ -27,12 +27,12 @@ import kotlinx.html.HTML
  * @since 0.0.1
  * @author Nils Jäkel
  */
-internal fun Application.codeGrantRouting(
+internal fun Application.grantRouting(
     redirectPath: String,
     channel: Channel<GrantCodeResponse>,
     successPage: HTML.() -> Unit,
     failurePage: HTML.() -> Unit,
-    onError: suspend (err: CodeErrorResponse) -> Unit,
+    onRequestError: suspend (err: CodeErrorResponse) -> Unit,
 ) {
     routing {
         get(redirectPath) {
@@ -47,7 +47,7 @@ internal fun Application.codeGrantRouting(
                 )
 
                 call.respondHtml(HttpStatusCode.ExpectationFailed, failurePage)
-                onError(oauthErrorCode)
+                onRequestError(oauthErrorCode)
                 return@get
             }
 
@@ -70,7 +70,7 @@ internal fun Application.codeGrantRouting(
  * @since 0.0.1
  * @author Nils Jäkel
  */
-internal fun Application.displayCodeRouting(
+internal fun Application.userCodeRouting(
     userCode: String,
     displayPath: String,
     userCodePage: HTML.(userCode: String) -> Unit,
