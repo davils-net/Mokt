@@ -17,7 +17,7 @@ import dev.redtronics.mokt.html.WebTheme
 import dev.redtronics.mokt.html.userCodePage
 import dev.redtronics.mokt.network.openInBrowser
 import dev.redtronics.mokt.response.device.DeviceCodeResponse
-import dev.redtronics.mokt.server.displayCodeRouting
+import dev.redtronics.mokt.server.userCodeRouting
 import io.ktor.http.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
@@ -42,7 +42,7 @@ public class UserCodeBuilder internal constructor(private val deviceCodeResponse
     public suspend fun inBrowser() {
         codeServer = embeddedServer(CIO, localServerUrl.port, localServerUrl.host) {
             val path = localServerUrl.fullPath.ifBlank { "/" }
-            displayCodeRouting(deviceCodeResponse.userCode, path, webPage)
+            userCodeRouting(deviceCodeResponse.userCode, path, webPage)
         }
 
         codeServer!!.start()

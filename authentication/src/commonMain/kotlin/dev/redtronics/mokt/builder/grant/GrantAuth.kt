@@ -20,7 +20,7 @@ import dev.redtronics.mokt.network.openInBrowser
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.GrantCodeResponse
 import dev.redtronics.mokt.response.device.CodeErrorResponse
-import dev.redtronics.mokt.server.codeGrantRouting
+import dev.redtronics.mokt.server.grantRouting
 import dev.redtronics.mokt.server.setup
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
@@ -91,7 +91,7 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
 
         val authServer = embeddedServer(CIO, localRedirectUrl.port, localRedirectUrl.host) {
             setup()
-            codeGrantRouting(path, authCodeChannel, successRedirectPage, failureRedirectPage, onRequestError)
+            grantRouting(path, authCodeChannel, successRedirectPage, failureRedirectPage, onRequestError)
         }
         authServer.start()
 
