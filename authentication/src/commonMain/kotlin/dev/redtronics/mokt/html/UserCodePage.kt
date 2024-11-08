@@ -11,6 +11,7 @@
 
 package dev.redtronics.mokt.html
 
+import dev.redtronics.mokt.build.BuildConstants
 import kotlinx.html.*
 
 /**
@@ -31,7 +32,7 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
         div("card") {
             img(
                 alt = "Mokt full logo",
-                src = "https://code.redtronics.dev/nils.jaekel/mokt/-/raw/master/assets/mokt_m_alpha.png?ref_type=heads",
+                src = BuildConstants.MOKT_LOGO_URL,
                 classes = "mokt"
             )
             div("code") {
@@ -55,7 +56,7 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
                 }
 
                 body {
-                    background-image: url(https://code.redtronics.dev/nils.jaekel/mokt/-/raw/feat/grant-auth/assets/background.png);
+                    background-image: url("${BuildConstants.MOKT_DEVICE_CODE_BACKGROUND}");
                     background-position: center;
                     background-size: cover;
                     display: flex;
@@ -100,16 +101,4 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
             }
         }
     }
-}
-
-/**
- * Represents the theme of the user code page.
- * Dark or Light Mode
- *
- * @since 0.0.1
- * @author Nils Jäkel
- * */
-public enum class WebTheme {
-    LIGHT,
-    DARK;
 }
