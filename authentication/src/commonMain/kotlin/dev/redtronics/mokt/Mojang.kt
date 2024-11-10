@@ -14,6 +14,7 @@
 package dev.redtronics.mokt
 
 import dev.redtronics.mokt.builder.mojang.MojangBuilder
+import dev.redtronics.mokt.builder.mojang.RelyingParty
 import dev.redtronics.mokt.builder.mojang.XBoxBuilder
 import dev.redtronics.mokt.builder.mojang.XstsBuilder
 import dev.redtronics.mokt.response.mojang.MojangResponse
@@ -87,7 +88,7 @@ public abstract class MojangGameAuth<out T : Provider> internal constructor() {
     public suspend fun xsts(
         xBoxResponse: XBoxResponse,
         onRequestError: suspend (response: HttpResponse) -> Unit = {},
-        relyingParty: String = "rp://api.minecraftservices.com"
+        relyingParty: RelyingParty = RelyingParty.JAVA
     ): XstsResponse? {
         val xsts = xsts(xBoxResponse, onRequestError) {
             this.relyingParty = relyingParty
