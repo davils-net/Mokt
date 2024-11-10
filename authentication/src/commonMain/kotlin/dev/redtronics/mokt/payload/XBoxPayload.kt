@@ -36,7 +36,7 @@ internal data class XBoxPayload(
 /**
  * Represents the properties of the xbox payload.
  *
- * @property xAuthMethod The auth method of the payload.
+ * @property authMethod The auth method of the payload.
  * @property siteName The site name of the payload.
  * @property rpsTicket The rps ticket of the payload.
  *
@@ -46,7 +46,7 @@ internal data class XBoxPayload(
 @Serializable
 internal data class XBoxProperties(
     @SerialName("AuthMethod")
-    val xAuthMethod: String,
+    val authMethod: String,
     @SerialName("SiteName")
     val siteName: String,
     @SerialName("RpsTicket")
