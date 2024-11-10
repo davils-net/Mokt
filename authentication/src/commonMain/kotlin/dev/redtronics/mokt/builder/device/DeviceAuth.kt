@@ -13,7 +13,7 @@
 
 package dev.redtronics.mokt.builder.device
 
-import dev.redtronics.mokt.MojangGameAuth
+import dev.redtronics.mokt.GrantType
 import dev.redtronics.mokt.OAuth
 import dev.redtronics.mokt.Provider
 import dev.redtronics.mokt.network.interval
@@ -36,8 +36,8 @@ import kotlin.time.Duration.Companion.seconds
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public abstract class DeviceAuth<out T : Provider> internal constructor() : OAuth, MojangGameAuth<T>() {
-    override val grantType: String = "urn:ietf:params:oauth:grant-type:device_code"
+public abstract class DeviceAuth<out T : Provider> internal constructor() : OAuth<T>() {
+    override val grantType: GrantType = GrantType.DEVICE_CODE
 
     /**
      * The local code redirect server to display the user code.
@@ -169,7 +169,7 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
             formParameters = parameters {
                 append("client_id", provider.clientId)
                 append("device_code", deviceCodeResponse.deviceCode)
-                append("grant_type", grantType)
+                append("grant_type", grantType.value)
 
                 if (provider.clientSecret != null) {
                     append("client_secret", provider.clientSecret!!)
@@ -194,4 +194,6 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
         codeServer?.stop()
         return@interval provider.json.decodeFromString(AccessResponse.serializer(), responseBody)
     }
+
+
 }

@@ -37,8 +37,8 @@ import kotlinx.html.HTML
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth, MojangGameAuth<T>() {
-    override val grantType: String = "authorization_code"
+public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth<T>() {
+    override val grantType: GrantType = GrantType.AUTHORIZATION_CODE
 
     /**
      * The authorize endpoint URL.
@@ -183,7 +183,7 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
                 append("scope", provider.scopes.joinToString(" ") { it.value })
                 append("code", grantCode.code)
                 append("redirect_uri", localRedirectUrl.toString())
-                append("grant_type", grantType)
+                append("grant_type", grantType.value)
                 append("state", state)
 
                 if (provider.clientSecret != null) {
