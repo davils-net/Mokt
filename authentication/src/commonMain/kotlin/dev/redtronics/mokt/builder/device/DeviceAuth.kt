@@ -26,6 +26,7 @@ import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.cio.*
+import io.ktor.server.engine.*
 import io.ktor.util.date.*
 import kotlin.time.Duration.Companion.seconds
 
@@ -44,7 +45,7 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    private var codeServer: CIOApplicationEngine? = null
+    private var codeServer: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? = null
 
 
     /**

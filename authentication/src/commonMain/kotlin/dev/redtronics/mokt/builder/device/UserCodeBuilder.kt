@@ -24,7 +24,7 @@ import io.ktor.server.engine.*
 import kotlinx.html.HTML
 
 public class UserCodeBuilder internal constructor(private val deviceCodeResponse: DeviceCodeResponse) {
-    private var codeServer: CIOApplicationEngine? = null
+    private var codeServer: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine. Configuration>? = null
 
     public val verificationUrl: Url
         get() = Url(deviceCodeResponse.verificationUri)
@@ -56,7 +56,7 @@ public class UserCodeBuilder internal constructor(private val deviceCodeResponse
 
     }
 
-    internal fun build(): CIOApplicationEngine? = codeServer
+    internal fun build(): EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine. Configuration>? = codeServer
 }
 
 public enum class DisplayMode {
