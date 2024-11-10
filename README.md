@@ -19,7 +19,7 @@ The following platforms are supported:
 |----------------|-----|----|-------|---------|---------|-------|-----|------|---------|
 | common         | ✅   | ✅  | ✅     | ✅       | ✅       | ✅     | ✅   | ✅    | ✅       |
 | core           | ✅   | ✅  | ✅     | ✅       | ✅       | ✅     | ✅   | ✅    | ✅       |
-| authentication | ✅   | ❌  | ✅     | ❌       | ❌       | ❌     | ❌   | ❌    | ❌       |
+| authentication | ✅   | ❌  | ✅     | ❌       | ❌       | ✅     | ✅   | ✅    | ✅       |
 
 ## Getting Started
 
