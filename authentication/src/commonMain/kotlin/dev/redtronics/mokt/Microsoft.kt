@@ -16,9 +16,7 @@ import dev.redtronics.mokt.builder.device.MicrosoftDeviceBuilder
 import dev.redtronics.mokt.builder.grant.GrantCodeBuilder
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
-import dev.redtronics.mokt.response.AccessResponse
 import io.ktor.client.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
 
@@ -54,16 +52,15 @@ public class Microsoft internal constructor(
      * */
     override val clientSecret: String?
 ) : Provider() {
+    override val name: String
+        get() = "Microsoft"
+    override var httpClient: HttpClient = client
+    override var json: Json = defaultJson
+
     init {
         val isClientIdValid = Regex("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}").matches(clientId)
         if (!isClientIdValid) throw IllegalArgumentException("Client id is not valid")
     }
-
-    override val name: String
-        get() = "Microsoft"
-
-    override var httpClient: HttpClient = client
-    override var json: Json = defaultJson
 
     /**
      * The [Tenant] value in the path of the request URL can be used to control
@@ -133,13 +130,6 @@ public class Microsoft internal constructor(
     public suspend fun <T> device(builder: suspend MicrosoftDeviceBuilder.() -> T): T {
         val deviceBuilder = MicrosoftDeviceBuilder(this)
         return builder(deviceBuilder)
-    }
-
-    override suspend fun requestAccessTokenFromRefreshToken(
-        refreshToken: String,
-        onRequestError: suspend (response: HttpResponse) -> Unit
-    ): AccessResponse? {
-        TODO("Not yet implemented")
     }
 }
 

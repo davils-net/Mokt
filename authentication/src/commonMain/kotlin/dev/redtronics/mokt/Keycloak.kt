@@ -177,17 +177,4 @@ public class Keycloak internal constructor(
 
         return json.decodeFromString(AccessResponse.serializer(), response.bodyAsText())
     }
-
-    /**
-     * Requests a new keycloak access token from the refresh token to renew the expired access token.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    override suspend fun requestAccessTokenFromRefreshToken(
-        refreshToken: String,
-        onRequestError: suspend (response: HttpResponse) -> Unit,
-    ): AccessResponse? {
-        TODO("Not yet implemented")
-    }
 }
