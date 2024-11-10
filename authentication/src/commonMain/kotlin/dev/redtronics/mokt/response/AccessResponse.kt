@@ -39,5 +39,7 @@ public data class AccessResponse(
     @SerialName("access_token")
     public val accessToken: String,
     @SerialName("refresh_token")
-    public val refreshToken: String
+    public val refreshToken: String,
+    @SerialName("id_token")
+    public val idToken: String? = null
 )
