@@ -105,6 +105,10 @@ public class UserCodeBuilder internal constructor(
         openInBrowser(localServerUrl, verificationUrl)
     }
 
+    public suspend fun inTerminal() {
+
+    }
+
     /**
      * Builds and returned the embedded server for displaying the user code.
      *
