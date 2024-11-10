@@ -36,6 +36,8 @@ import kotlin.time.Duration.Companion.seconds
  * @author Nils Jäkel
  * */
 public abstract class DeviceAuth<out T : Provider> internal constructor() : OAuth, MojangGameAuth<T>() {
+    override val grantType: String = "urn:ietf:params:oauth:grant-type:device_code"
+
     /**
      * The local code redirect server to display the user code.
      *
@@ -44,7 +46,6 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
      * */
     private var codeServer: CIOApplicationEngine? = null
 
-    override val grantType: String = "urn:ietf:params:oauth:grant-type:device_code"
 
     /**
      * Endpoint to request the device and user code.
