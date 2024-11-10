@@ -18,14 +18,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.awt.Desktop
 
-public actual suspend fun openInBrowser(url: Url): Unit = withContext(Dispatchers.IO) {
-    when(os) {
-        OsType.WINDOWS -> {
-            Desktop.getDesktop().browse(url.toURI())
-        }
-        else -> {
-            val process = ProcessBuilder("xdg-open", url.toString())
-            process.start()
+public actual suspend fun openInBrowser(vararg url: Url): Unit = withContext(Dispatchers.IO) {
+    url.forEach {
+        when (os) {
+            OsType.WINDOWS -> {
+                Desktop.getDesktop().browse(it.toURI())
+            }
+
+            else -> {
+                val process = ProcessBuilder("xdg-open", url.toString())
+                process.start()
+            }
         }
     }
 }

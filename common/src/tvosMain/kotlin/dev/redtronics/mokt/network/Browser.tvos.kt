@@ -17,6 +17,8 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import dev.redtronics.mokt.cinterop.open_url
 
-public actual suspend fun openInBrowser(url: Url): Unit = withContext(Dispatchers.IO) {
-    open_url(url.toString())
+public actual suspend fun openInBrowser(vararg url: Url): Unit = withContext(Dispatchers.IO) {
+    url.forEach {
+        open_url(it.toString())
+    }
 }
