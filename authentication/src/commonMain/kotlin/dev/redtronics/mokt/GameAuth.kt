@@ -23,14 +23,14 @@ import dev.redtronics.mokt.response.mojang.XstsResponse
 import io.ktor.client.statement.*
 
 /**
- * Implements the complete mojang authentication to the provider, that is inherited from [MojangGameAuth].
+ * Implements the complete mojang authentication to the provider, that is inherited from [GameAuth].
  *
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public abstract class MojangGameAuth<out T : Provider> internal constructor() {
+public abstract class GameAuth<out T : Provider> internal constructor() {
     /**
-     * The provider that is inherited from [MojangGameAuth].
+     * The provider that is inherited from [GameAuth].
      *
      * @since 0.0.1
      * @author Nils Jäkel
