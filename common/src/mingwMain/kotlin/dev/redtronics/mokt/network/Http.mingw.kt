@@ -22,9 +22,9 @@ public actual val client: HttpClient = HttpClient(WinHttp) {
     }
 
     install(HttpTimeout) {
-        connectTimeoutMillis = HttpTimeout.INFINITE_TIMEOUT_MS
+        connectTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
         requestTimeoutMillis = 1000 * 30
-        socketTimeoutMillis = HttpTimeout.INFINITE_TIMEOUT_MS
+        socketTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
     }
 
     install(HttpRequestRetry) {

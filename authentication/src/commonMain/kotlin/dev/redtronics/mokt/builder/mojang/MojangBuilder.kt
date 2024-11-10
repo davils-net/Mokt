@@ -22,14 +22,41 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
 
+/**
+ * Configuration for the Mojang authentication to get the Minecraft access token.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public class MojangBuilder internal constructor(
     override val httpClient: HttpClient,
     override val json: Json,
+
+    /**
+     * The xsts access token response. (Microsoft store services)
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     private val xstsResponse: XstsResponse
 ) : MinecraftAuthBuilder() {
+    /**
+     * The login endpoint of the Mojang API. `https://api.minecraftservices.com/authentication/login_with_xbox`
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public val minecraftLoginEndpoint: Url
         get() = Url("https://api.minecraftservices.com/authentication/login_with_xbox")
 
+    /**
+     * Executes the mojang access token request.
+     *
+     * @param onRequestError The function to be called if an error occurs during the mojang access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     internal suspend fun build(onRequestError: suspend (response: HttpResponse) -> Unit): MojangResponse? {
         val payload = MojangPayload(
             identityToken = "XBL3.0 x=${xstsResponse.displayClaims.xui[0].uhs};${xstsResponse.token}"

@@ -14,6 +14,7 @@
 package dev.redtronics.mokt
 
 import dev.redtronics.mokt.builder.mojang.MojangBuilder
+import dev.redtronics.mokt.builder.mojang.RelyingParty
 import dev.redtronics.mokt.builder.mojang.XBoxBuilder
 import dev.redtronics.mokt.builder.mojang.XstsBuilder
 import dev.redtronics.mokt.response.mojang.MojangResponse
@@ -22,14 +23,14 @@ import dev.redtronics.mokt.response.mojang.XstsResponse
 import io.ktor.client.statement.*
 
 /**
- * Implements the complete mojang authentication to the provider, that is inherited from [MojangGameAuth].
+ * Implements the complete mojang authentication to the provider, that is inherited from [GameAuth].
  *
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public abstract class MojangGameAuth<out T : Provider> {
+public abstract class GameAuth<out T : Provider> internal constructor() {
     /**
-     * The provider that is inherited from [MojangGameAuth].
+     * The provider that is inherited from [GameAuth].
      *
      * @since 0.0.1
      * @author Nils Jäkel
@@ -87,7 +88,7 @@ public abstract class MojangGameAuth<out T : Provider> {
     public suspend fun xsts(
         xBoxResponse: XBoxResponse,
         onRequestError: suspend (response: HttpResponse) -> Unit = {},
-        relyingParty: String = "rp://api.minecraftservices.com"
+        relyingParty: RelyingParty = RelyingParty.JAVA
     ): XstsResponse? {
         val xsts = xsts(xBoxResponse, onRequestError) {
             this.relyingParty = relyingParty

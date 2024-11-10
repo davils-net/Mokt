@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
 /**
  * Represents the Display Claims from the auth endpoints.
  *
- * @property xui The [List] of User Hash Strings.
+ * @property xui A [List] of User Hash Strings.
  *
  * @since 0.0.1
  * @author Nils Jäkel

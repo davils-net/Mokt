@@ -9,14 +9,13 @@
  * and/or sell copies of the Software.
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package dev.redtronics.mokt
 
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
 import dev.redtronics.mokt.response.AccessResponse
 import io.ktor.client.*
+import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
@@ -87,24 +86,53 @@ public abstract class Provider {
     public var scopes: List<Scope> = Scope.allScopes
 
     /**
-     * Requests the access token from the refresh token to renew the expired access token.
+     * Requests an access token from the given refresh token.
      *
-     * @param refreshToken The refresh token from the expired access token.
-     * @param onRequestError The function to be called if an error occurs during the renewal of the access token.
+     * @param refreshToken The refresh token.
+     * @param additionalParameters The additional parameters to be appended to the request.
+     * @param onRequestError The function to be called if an error occurs during the access token request.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public abstract suspend fun requestAccessTokenFromRefreshToken(
+    public suspend fun requestAccessTokenFromRefreshToken(
         refreshToken: String,
+        additionalParameters: Map<String, String> = mapOf(),
         onRequestError: suspend (response: HttpResponse) -> Unit = {}
-    ): AccessResponse?
+    ): AccessResponse? {
+        val response = httpClient.submitForm(
+            url = tokenEndpointUrl.toString(),
+            formParameters = parameters {
+                append("client_id", clientId)
+                append("scope", scopes.joinToString(" ") { it.value })
+                append("refresh_token", refreshToken)
+                append("grant_type", GrantType.REFRESH_TOKEN.value)
+
+                if (clientSecret != null) {
+                    append("client_secret", clientSecret!!)
+                }
+
+                additionalParameters.forEach { (key, value) ->
+                    append(key, value)
+                }
+            }
+        )
+
+        if (!response.status.isSuccess()) {
+            onRequestError(response)
+            return null
+        }
+
+        return json.decodeFromString(AccessResponse.serializer(), response.bodyAsText())
+    }
 }
 
 /**
  * Central adapter to communicate with the Microsoft authentication provider.
  * It creates an instance of [Microsoft] and configures it with the provided builder.
  *
+ * @param clientId The client id of the authentication provider.
+ * @param clientSecret The client secret of the authentication provider. If null, the client secret is try to get from the environment `MICROSOFT_CLIENT_SECRET`.
  * @param builder The builder to configure the [Microsoft] instance.
  * @return The initialized and configured [Microsoft] instance.
  *
@@ -139,7 +167,7 @@ public suspend fun microsoftAuth(
     clientSecret: String? = null,
     tenant: Tenant = Tenant.CONSUMERS,
     httpClient: HttpClient = client,
-    json: Json = defaultJson
+    json: Json = defaultJson,
 ): Microsoft = microsoftAuth(clientId, clientSecret) {
     this.tenant = tenant
     this.httpClient = httpClient
@@ -150,6 +178,8 @@ public suspend fun microsoftAuth(
  * Central adapter to communicate with the Keycloak authentication provider.
  * It creates an instance of [Keycloak] and configures it with the provided builder.
  *
+ * @param clientId The client id of the authentication provider.
+ * @param clientSecret The client secret of the authentication provider. If null, the client secret is try to get from the environment `KEYCLOAK_CLIENT_SECRET`.
  * @param builder The builder to configure the [Keycloak] instance.
  * @return The initialized and configured [Keycloak] instance.
  *
@@ -161,7 +191,7 @@ public suspend fun keycloakAuth(
     clientSecret: String? = getEnv("KEYCLOAK_CLIENT_SECRET"),
     realm: String,
     instanceUrl: Url,
-    builder: suspend Keycloak.() -> Unit
+    builder: suspend Keycloak.() -> Unit,
 ): Keycloak = Keycloak(clientId, clientSecret, realm, instanceUrl).apply { builder() }
 
 /**
@@ -182,9 +212,9 @@ public suspend fun keycloakAuth(
  * */
 public suspend fun keycloakAuth(
     clientId: String,
-    instanceUrl: Url,
-    realm: String,
     clientSecret: String? = null,
+    realm: String,
+    instanceUrl: Url,
     httpClient: HttpClient = client,
     json: Json = defaultJson
 ): Keycloak = keycloakAuth(clientId, clientSecret, realm, instanceUrl) {

@@ -13,9 +13,11 @@
 
 package dev.redtronics.mokt.builder.device
 
-import dev.redtronics.mokt.MojangGameAuth
+import dev.redtronics.mokt.GrantType
 import dev.redtronics.mokt.OAuth
 import dev.redtronics.mokt.Provider
+import dev.redtronics.mokt.html.WebTheme
+import dev.redtronics.mokt.html.userCodePage
 import dev.redtronics.mokt.network.interval
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.device.CodeErrorResponse
@@ -26,7 +28,9 @@ import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.cio.*
+import io.ktor.server.engine.*
 import io.ktor.util.date.*
+import kotlinx.html.HTML
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -35,16 +39,17 @@ import kotlin.time.Duration.Companion.seconds
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public abstract class DeviceAuth<out T : Provider> internal constructor() : OAuth, MojangGameAuth<T>() {
+public abstract class DeviceAuth<out T : Provider> internal constructor() : OAuth<T>() {
+    override val grantType: GrantType = GrantType.DEVICE_CODE
+
     /**
      * The local code redirect server to display the user code.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    private var codeServer: CIOApplicationEngine? = null
+    private var codeServer: EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? = null
 
-    override val grantType: String = "urn:ietf:params:oauth:grant-type:device_code"
 
     /**
      * Endpoint to request the device and user code.
@@ -66,6 +71,26 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
     public suspend fun displayCode(deviceCodeResponse: DeviceCodeResponse, builder: suspend UserCodeBuilder.() -> Unit) {
         val userCodeBuilder = UserCodeBuilder(deviceCodeResponse).apply { builder() }
         codeServer = userCodeBuilder.build()
+    }
+
+    public suspend fun displayCode(
+        deviceCodeResponse: DeviceCodeResponse,
+        displayMode: DisplayMode = DisplayMode.BROWSER,
+        localServerUrl: Url = Url("http://localhost:18769/usercode"),
+        webPageTheme: WebTheme = WebTheme.DARK,
+        webPage: HTML.(userCode: String) -> Unit = { userCode -> userCodePage(userCode, webPageTheme) },
+        forceHttps: Boolean = false,
+    ): Unit = displayCode(deviceCodeResponse) {
+        this.localServerUrl = localServerUrl
+        this.webPageTheme = webPageTheme
+        this.forceHttps = forceHttps
+        this.webPage = webPage
+
+        if (displayMode == DisplayMode.BROWSER) {
+            inBrowser()
+        } else {
+            inTerminal()
+        }
     }
 
     /**
@@ -167,7 +192,7 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
             formParameters = parameters {
                 append("client_id", provider.clientId)
                 append("device_code", deviceCodeResponse.deviceCode)
-                append("grant_type", grantType)
+                append("grant_type", grantType.value)
 
                 if (provider.clientSecret != null) {
                     append("client_secret", provider.clientSecret!!)
@@ -192,4 +217,6 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
         codeServer?.stop()
         return@interval provider.json.decodeFromString(AccessResponse.serializer(), responseBody)
     }
+
+
 }

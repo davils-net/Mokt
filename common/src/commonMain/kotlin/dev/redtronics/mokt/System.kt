@@ -17,6 +17,10 @@ public enum class OsType(public val value: String) {
     WINDOWS("windows"),
     LINUX("linux"),
     ANDROID("android"),
+    MACOS("macos"),
+    TVOS("tvos"),
+    WATCHOS("watchos"),
+    IOS("ios"),
     UNKNOWN("unknown");
 
     public companion object {

@@ -19,7 +19,7 @@ import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-public actual suspend fun openInBrowser(url: Url): Unit = throw FeatureNotSupported("In Android we need to open a url in the browser a context that is only gettable from the instance of the main app. Furthermore it is not possible to set the context as parameter, because the other native implementations don't support it. For that case, we implemented a other function called openInAndroidBrowser which can be used instead.")
+public actual suspend fun openInBrowser(vararg url: Url): Unit = throw FeatureNotSupported("In Android we need to open a url in the browser a context that is only gettable from the instance of the main app. Furthermore it is not possible to set the context as parameter, because the other native implementations don't support it. For that case, we implemented a other function called openInAndroidBrowser which can be used instead.")
 
 /**
  * Opens a given [Url] in the default browser.
@@ -30,8 +30,10 @@ public actual suspend fun openInBrowser(url: Url): Unit = throw FeatureNotSuppor
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public suspend fun openInAndroidBrowser(url: Url, context: Context): Unit = withContext(Dispatchers.IO) {
-    val builder = CustomTabsIntent.Builder()
-    val customTabsIntent = builder.build()
-    customTabsIntent.launchUrl(context, Uri.parse(url.toString()))
+public suspend fun openInAndroidBrowser(vararg url: Url, context: Context): Unit = withContext(Dispatchers.IO) {
+    url.forEach {
+        val builder = CustomTabsIntent.Builder()
+        val customTabsIntent = builder.build()
+        customTabsIntent.launchUrl(context, Uri.parse(it.toString()))
+    }
 }

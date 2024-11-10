@@ -30,7 +30,22 @@ import io.ktor.server.util.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.html.HTML
 
-public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth, MojangGameAuth<T>() {
+/**
+ * Abstract class for grant authentication.
+ * Contains the necessary properties and methods for the grant authentication flow.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
+public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth<T>() {
+    override val grantType: GrantType = GrantType.AUTHORIZATION_CODE
+
+    /**
+     * The authorize endpoint URL.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public abstract val authorizeEndpointUrl: Url
 
     /**
@@ -43,18 +58,28 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
     public var localRedirectUrl: Url = Url(getEnv("LOCAL_REDIRECT_URL") ?: "http://localhost:8080")
 
     /**
-     * If you are not using code, you are using directly the hybrid flow.
+     * The response type for the code request.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
     public val responseType: ResponseType = ResponseType.CODE
 
+    /**
+     * The response mode for the code request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public val responseMode: ResponseMode = ResponseMode.QUERY
 
+    /**
+     * Unique identifier for the request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public var state: String = generateRandomIdentifier()
-
-    override val grantType: String = "authorization_code"
 
     /**
      * Checks if the local redirect URL is using HTTPS.
@@ -93,6 +118,15 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
         "Please try again!"
     ) }
 
+    /**
+     * Requests the authorization code from the authorization server.
+     *
+     * @param browser The function to open the browser.
+     * @param onRequestError The function to be called if an error occurs during the authorization code request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public suspend fun requestGrantCode(
         browser: suspend (url: Url) -> Unit = { url -> openInBrowser(url) },
         onRequestError: suspend (err: CodeErrorResponse) -> Unit = {}
@@ -127,6 +161,16 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
         return code
     }
 
+    /**
+     * Requests the access token from the token endpoint.
+     *
+     * @param grantCode The grant code response.
+     * @param additionalParameters The additional parameters to be appended to the request.
+     * @param onRequestError The function to be called if an error occurs during the access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public suspend fun requestAccessToken(
         grantCode: GrantCodeResponse,
         additionalParameters: Map<String, String> = mapOf(),
@@ -139,7 +183,7 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
                 append("scope", provider.scopes.joinToString(" ") { it.value })
                 append("code", grantCode.code)
                 append("redirect_uri", localRedirectUrl.toString())
-                append("grant_type", grantType)
+                append("grant_type", grantType.value)
                 append("state", state)
 
                 if (provider.clientSecret != null) {
@@ -160,11 +204,23 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
     }
 }
 
+/**
+ * Possible response types for the authorization request.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public enum class ResponseType(public val value: String) {
     CODE("code"),
     UNKNOWN("unknown");
 }
 
+/**
+ * Possible response modes for the authorization request.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public enum class ResponseMode(public val value: String) {
     QUERY("query"),
     UNKNOWN("unknown");

@@ -23,31 +23,71 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
 
+/**
+ * Configures the auth on the microsoft store servers to get the xsts token access response.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public class XstsBuilder internal constructor(
     override val httpClient: HttpClient,
     override val json: Json,
+
+    /**
+     * The XBox access token response.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     private val xBoxResponse: XBoxResponse
 ) : MinecraftAuthBuilder() {
+    /**
+     * The sandbox id of the payload.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public val sandboxId: String
         get() = "RETAIL"
 
-    public var relyingParty: String = "rp://api.minecraftservices.com/"
+    /**
+     * The relying party, depending on the platform you would authenticate on. ([RelyingParty.JAVA], [RelyingParty.BEDROCK])
+     * If you authenticate with bedrock you can use the xsts token directly for the bedrock servers.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    public var relyingParty: RelyingParty = RelyingParty.JAVA
 
-    public val authUrl: Url
+    /**
+     * The auth endpoint to get the xsts token access response. `https://xsts.auth.xboxlive.com/xsts/authorize`
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    public val xstsLoginEndpoint: Url
         get() = Url("https://xsts.auth.xboxlive.com/xsts/authorize")
 
+    /**
+     * Executes the xsts token access response.
+     *
+     * @param onRequestError The function to be called if an error occurs during the xsts access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     internal suspend fun build(onRequestError: suspend (response: HttpResponse) -> Unit): XstsResponse?  {
         val xstsPayload = XstsPayload(
             properties = XstsProperties(
                 sandboxId = sandboxId,
                 userTokens = listOf(xBoxResponse.token)
             ),
-            relyingParty = relyingParty,
+            relyingParty = relyingParty.party,
             tokenType = TokenType.JWT
         )
 
         val response = httpClient.post {
-            url(authUrl)
+            url(xstsLoginEndpoint)
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(XstsPayload.serializer(), xstsPayload))
         }
@@ -59,4 +99,16 @@ public class XstsBuilder internal constructor(
 
         return json.decodeFromString(XstsResponse.serializer(), response.bodyAsText())
     }
+}
+
+/**
+ * The relying party, depending on the platform you would authenticate on. ([RelyingParty.JAVA], [RelyingParty.BEDROCK])
+ * If you authenticate with bedrock you can use the xsts token directly for the bedrock servers.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
+public enum class RelyingParty(public val party: String) {
+    JAVA("rp://api.minecraftservices.com/"),
+    BEDROCK("https://pocket.realms.minecraft.net/");
 }

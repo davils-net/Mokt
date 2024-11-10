@@ -13,6 +13,14 @@ package dev.redtronics.mokt.payload
 
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the payload for the Mojang endpoint.
+ *
+ * @property identityToken The identity token of the payload.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 @Serializable
 internal data class MojangPayload(
     val identityToken: String
