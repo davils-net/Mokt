@@ -17,24 +17,18 @@ package dev.redtronics.mokt
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public interface OAuth {
+public abstract class OAuth<out T : Provider> : GameAuth<T>() {
     /**
      * OAuth 2.0 Grant Type
      *
      * A grant type is the method by which an application requests an access token.
-     * OAuth 2.0 defines several standard grant types, including:
-     *
-     * * Authorization Code Flow: Used for web applications.
-     * * Client Credentials Flow: Used for server-to-server communication.
-     * * Refresh Token Flow: Used for obtaining a new access token using a refresh token.
-     * * Password Flow: Used for obtaining an access token using a username and password.
-     *
-     * Each grant type is optimized for a specific use case, such as web apps, native apps, devices without a web browser, or server-to-server applications.
+     * Each grant type is optimized for a specific use case, such as web apps, native apps, devices
+     * without a web browser, or server-to-server applications.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      */
-    public val grantType: String
+    public abstract val grantType: GrantType
 }
 
 /**
@@ -61,4 +55,20 @@ public enum class Scope(public val value: String) {
         public val allScopes: List<Scope>
             get() = entries.toList()
     }
+}
+
+/**
+ * OAuth 2.0 Grant Type
+ *
+ * A grant type is the method by which an application requests an access token.
+ * Each grant type is optimized for a specific use case, such as web apps, native apps, devices
+ * without a web browser, or server-to-server applications.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ */
+public enum class GrantType(public val value: String) {
+    AUTHORIZATION_CODE("authorization_code"),
+    REFRESH_TOKEN("refresh_token"),
+    DEVICE_CODE("urn:ietf:params:oauth:grant-type:device_code");
 }
