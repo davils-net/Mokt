@@ -16,6 +16,8 @@ package dev.redtronics.mokt.builder.device
 import dev.redtronics.mokt.GrantType
 import dev.redtronics.mokt.OAuth
 import dev.redtronics.mokt.Provider
+import dev.redtronics.mokt.html.WebTheme
+import dev.redtronics.mokt.html.userCodePage
 import dev.redtronics.mokt.network.interval
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.device.CodeErrorResponse
@@ -28,6 +30,7 @@ import io.ktor.http.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.util.date.*
+import kotlinx.html.HTML
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -68,6 +71,26 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
     public suspend fun displayCode(deviceCodeResponse: DeviceCodeResponse, builder: suspend UserCodeBuilder.() -> Unit) {
         val userCodeBuilder = UserCodeBuilder(deviceCodeResponse).apply { builder() }
         codeServer = userCodeBuilder.build()
+    }
+
+    public suspend fun displayCode(
+        deviceCodeResponse: DeviceCodeResponse,
+        displayMode: DisplayMode = DisplayMode.BROWSER,
+        localServerUrl: Url = Url("http://localhost:18769/usercode"),
+        webPageTheme: WebTheme = WebTheme.DARK,
+        webPage: HTML.(userCode: String) -> Unit = { userCode -> userCodePage(userCode, webPageTheme) },
+        forceHttps: Boolean = false,
+    ): Unit = displayCode(deviceCodeResponse) {
+        this.localServerUrl = localServerUrl
+        this.webPageTheme = webPageTheme
+        this.forceHttps = forceHttps
+        this.webPage = webPage
+
+        if (displayMode == DisplayMode.BROWSER) {
+            inBrowser()
+        } else {
+            inTerminal()
+        }
     }
 
     /**
