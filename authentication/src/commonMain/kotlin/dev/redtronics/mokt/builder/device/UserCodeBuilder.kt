@@ -102,7 +102,8 @@ public class UserCodeBuilder internal constructor(
         }
 
         codeServer!!.start()
-        openInBrowser(localServerUrl, verificationUrl)
+        openInBrowser(localServerUrl)
+        openInBrowser(verificationUrl)
     }
 
     public suspend fun inTerminal() {

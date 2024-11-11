@@ -13,5 +13,5 @@ package dev.redtronics.mokt.network
 
 import io.ktor.http.*
 
-public expect suspend fun openInBrowser(vararg url: Url)
+public expect suspend fun openInBrowser(url: Url)
 

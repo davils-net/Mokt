@@ -15,8 +15,8 @@ import io.ktor.http.*
 import kotlinx.coroutines.await
 import kotlin.js.Promise
 
-public actual suspend fun openInBrowser(vararg url: Url) {
-    url.forEach { open(it).await() }
+public actual suspend fun openInBrowser(url: Url) {
+    open(url).await()
 }
 
 @JsModule("open")
