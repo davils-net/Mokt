@@ -13,17 +13,21 @@
 
 package dev.redtronics.mokt.builder.device
 
+import com.github.ajalt.mordant.terminal.Terminal
 import dev.redtronics.mokt.GrantType
 import dev.redtronics.mokt.OAuth
 import dev.redtronics.mokt.Provider
 import dev.redtronics.mokt.build.BuildConstants
+import dev.redtronics.mokt.builder.device.code.UserCodeBuilder
 import dev.redtronics.mokt.html.WebTheme
+import dev.redtronics.mokt.html.userCodePage
 import dev.redtronics.mokt.network.interval
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.device.CodeErrorResponse
 import dev.redtronics.mokt.response.device.DeviceAuthStateError
 import dev.redtronics.mokt.response.device.DeviceAuthStateErrorItem
 import dev.redtronics.mokt.response.device.DeviceCodeResponse
+import dev.redtronics.mokt.terminal.userCodeScreen
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -74,40 +78,67 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
     }
 
     /**
-     * Displays the user code to the user.
+     * Displays the user code in the browser.
      *
-     * @param webPageOverride The function to override the default web page.
      * @param deviceCodeResponse The device code response.
-     * @param displayMode The display mode to use.
+     * @param theme The theme to use.
      * @param localServerUrl The local server url to use.
      * @param title The title to use.
      * @param logoUrl The logo url to use.
      * @param logoDescription The logo description to use.
      * @param backgroundUrl The background url to use.
      * @param userCodeHint The user code hint to use.
-     * @param theme The theme to use.
+     * @param page The page to display the user code.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
     public suspend fun displayCode(
-        webPageOverride: (HTML.(userCode: String) -> Unit)? = null,
         deviceCodeResponse: DeviceCodeResponse,
-        displayMode: DisplayMode = DisplayMode.BROWSER,
+        theme: WebTheme,
         localServerUrl: Url = Url("http://localhost:18769/usercode"),
         title: String = "Device Code",
         logoUrl: Url = Url(BuildConstants.MOKT_LOGO_URL),
         logoDescription: String = "Mokt logo",
         backgroundUrl: Url = Url(BuildConstants.MOKT_DEVICE_CODE_BACKGROUND),
         userCodeHint: String = "Enter the code below in your browser",
-        theme: WebTheme = WebTheme.DARK,
+        page: HTML.(userCode: String) -> Unit = { userCode -> userCodePage(userCode, title, logoUrl, logoDescription, backgroundUrl, userCodeHint, theme) },
     ): Unit = displayCode(deviceCodeResponse) {
-        this.localServerUrl = localServerUrl
+        inBrowser {
+            this.title = title
+            this.userCodeHint = userCodeHint
+            this.localServerUrl = localServerUrl
+            this.logoUrl = logoUrl
+            this.logoDescription = logoDescription
+            this.backgroundUrl = backgroundUrl
+            this.page = page
+        }
+    }
 
-        if (displayMode == DisplayMode.BROWSER) {
-            inBrowser(webPageOverride, title, logoUrl, logoDescription, backgroundUrl, userCodeHint, theme)
-        } else {
-            inTerminal()
+    /**
+     * Displays the user code in the terminal.
+     *
+     * @param deviceCodeResponse The device code response.
+     * @param title The title to use.
+     * @param userCodeHint The user code hint to use.
+     * @param screen The screen to display the user code.
+     * @param terminal The terminal to use.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    public suspend fun displayCode(
+        deviceCodeResponse: DeviceCodeResponse,
+        title: String = "Device Code",
+        userCodeHint: String = "Enter the code below in your browser",
+        screen: suspend Terminal.(userCode: String) -> Unit = { userCode -> userCodeScreen(userCode, title, userCodeHint, Url(deviceCodeResponse.verificationUri)) },
+        terminal: Terminal = Terminal()
+    ): Unit = displayCode(deviceCodeResponse) {
+        inTerminal {
+            this.title = title
+            this.userCodeHint = userCodeHint
+            this.screen = screen
+            this.terminal = terminal
         }
     }
 
@@ -235,6 +266,4 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
         codeServer?.stop()
         return@interval provider.json.decodeFromString(AccessResponse.serializer(), responseBody)
     }
-
-
 }
