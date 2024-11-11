@@ -66,34 +66,41 @@ public class UserCodeBuilder internal constructor(
     public var localServerUrl: Url = Url("http://localhost:18769/usercode")
 
     /**
-     * The web page theme for the local redirect page.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public var webPageTheme: WebTheme = WebTheme.DARK
-
-    /**
      * Displays the user code in the browser and opens the verification
      * url in the default web browser.
+     *
+     * @param webPageOverride The function to override the default user code page.
+     * @param title The title of the user code page.
+     * @param logoUrl The url of the logo to be displayed on the user code page.
+     * @param logoDescription The description of the logo to be displayed on the user code page.
+     * @param backgroundUrl The url of the background image to be displayed on the user code page.
+     * @param userCodeHint The hint to be displayed on the user code page.
+     * @param theme The theme of the user code page.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
     public suspend fun inBrowser(
+        webPageOverride: (HTML.(userCode: String) -> Unit)? = null,
         title: String = "Device Code",
         logoUrl: Url = Url(BuildConstants.MOKT_LOGO_URL),
         logoDescription: String = "Mokt logo",
         backgroundUrl: Url = Url(BuildConstants.MOKT_DEVICE_CODE_BACKGROUND),
         userCodeHint: String = "Enter the code below in your browser",
-        theme: WebTheme = WebTheme.DARK,
-        webPage: HTML.(userCode: String) -> Unit = { userCode -> userCodePage(userCode, title, logoUrl, logoDescription, backgroundUrl, userCodeHint, theme) }
+        theme: WebTheme = WebTheme.DARK
     ) {
+        val webPage: HTML.(userCode: String) -> Unit = { userCode ->
+            if (webPageOverride != null) {
+                webPageOverride(userCode)
+            } else {
+                userCodePage(userCode, title, logoUrl, logoDescription, backgroundUrl, userCodeHint, theme)
+            }
+        }
+
         codeServer = embeddedServer(CIO, localServerUrl.port, localServerUrl.host) {
             val path = localServerUrl.fullPath.ifBlank { "/" }
             userCodeRouting(deviceCodeResponse.userCode, path, webPage)
         }
-
         codeServer!!.start()
         openInBrowser(localServerUrl)
         openInBrowser(verificationUrl)

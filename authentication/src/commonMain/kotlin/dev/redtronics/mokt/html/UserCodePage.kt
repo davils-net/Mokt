@@ -11,7 +11,6 @@
 
 package dev.redtronics.mokt.html
 
-import dev.redtronics.mokt.build.BuildConstants
 import io.ktor.http.*
 import kotlinx.html.*
 
@@ -19,7 +18,12 @@ import kotlinx.html.*
  * Simple template page to display the user code.
  *
  * @param userCode The user code to be displayed.
- * @param theme The theme to be used.
+ * @param title The title of the page.
+ * @param logoUrl The url of the logo.
+ * @param logoDescription The description of the logo.
+ * @param backgroundUrl The url of the background image.
+ * @param userCodeHint The hint for the user code.
+ * @param theme The theme of the page.
  *
  * @since 0.0.1
  * @author Nils Jäkel
