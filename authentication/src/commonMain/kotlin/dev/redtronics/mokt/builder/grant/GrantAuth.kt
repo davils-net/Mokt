@@ -105,8 +105,8 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
     public var failureRedirectPage: HTML.() -> Unit = { redirectPage(
         "Authentication failed",
         "Please try again!",
-        Color("#ff0000"),
         Color("#ffffff"),
+        Color("#ff0000"),
         Color("#b20000")
     ) }
 
@@ -122,8 +122,8 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
     public suspend fun requestGrantCode(
         browser: suspend (url: Url) -> Unit = { url -> openInBrowser(url) },
         onRequestError: suspend (err: CodeErrorResponse) -> Unit = {}
-    ): GrantCodeResponse {
-        val authCodeChannel: Channel<GrantCodeResponse> = Channel()
+    ): GrantCodeResponse? {
+        val authCodeChannel: Channel<GrantCodeResponse?> = Channel()
         val path = localRedirectUrl.fullPath.ifBlank { "/" }
 
         val authServer = embeddedServer(CIO, localRedirectUrl.port, localRedirectUrl.host) {
