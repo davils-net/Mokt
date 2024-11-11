@@ -82,15 +82,6 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
     public var state: String = generateRandomIdentifier()
 
     /**
-     * Checks if the local redirect URL is using HTTPS.
-     * If this is not the case, the validation check will throw an exception.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public var requireHttpsByRedirect: Boolean = false
-
-    /**
      * The page that will be shown after a successful authorization.
      *
      * @since 0.0.1
@@ -190,8 +181,8 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
                     append("client_secret", provider.clientSecret!!)
                 }
 
-                additionalParameters.forEach {
-                    append(it.key, it.value)
+                additionalParameters.forEach { (key, value) ->
+                    append(key, value)
                 }
             }
         )

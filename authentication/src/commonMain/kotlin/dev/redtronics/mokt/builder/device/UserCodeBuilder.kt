@@ -81,14 +81,6 @@ public class UserCodeBuilder internal constructor(
     public var webPage: HTML.(userCode: String) -> Unit = { userCode -> userCodePage(userCode, webPageTheme) }
 
     /**
-     * Whenever the local redirect server should use https instead of http.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public var forceHttps: Boolean = false
-
-    /**
      * Displays the user code in the browser and opens the verification
      * url in the default web browser.
      *
