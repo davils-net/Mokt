@@ -15,6 +15,7 @@ package dev.redtronics.mokt.builder.grant
 
 import dev.redtronics.mokt.*
 import dev.redtronics.mokt.html.redirectPage
+import dev.redtronics.mokt.html.style.Color
 import dev.redtronics.mokt.network.openInBrowser
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.GrantCodeResponse
@@ -88,11 +89,11 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
      * @author Nils Jäkel
      * */
     public var successRedirectPage: HTML.() -> Unit = { redirectPage(
-        "#ffffff",
-        "#009320",
-        "#bcff00",
         "Authentication successful",
-        "You can close this page now!"
+        "You can close this page now!",
+        Color("#ffffff"),
+        Color("#009320"),
+        Color("#009320")
     ) }
 
     /**
@@ -102,11 +103,11 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
      * @author Nils Jäkel
      * */
     public var failureRedirectPage: HTML.() -> Unit = { redirectPage(
-        "#ffffff",
-        "#b20000",
-        "#ff0000",
         "Authentication failed",
-        "Please try again!"
+        "Please try again!",
+        Color("#ff0000"),
+        Color("#ffffff"),
+        Color("#b20000")
     ) }
 
     /**
