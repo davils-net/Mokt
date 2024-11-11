@@ -13,6 +13,7 @@
 
 package dev.redtronics.mokt.builder.device
 
+import dev.redtronics.mokt.build.BuildConstants
 import dev.redtronics.mokt.html.WebTheme
 import dev.redtronics.mokt.html.userCodePage
 import dev.redtronics.mokt.network.openInBrowser
@@ -73,21 +74,21 @@ public class UserCodeBuilder internal constructor(
     public var webPageTheme: WebTheme = WebTheme.DARK
 
     /**
-     * The rendered web page to display the user code.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public var webPage: HTML.(userCode: String) -> Unit = { userCode -> userCodePage(userCode, webPageTheme) }
-
-    /**
      * Displays the user code in the browser and opens the verification
      * url in the default web browser.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun inBrowser() {
+    public suspend fun inBrowser(
+        title: String = "Device Code",
+        logoUrl: Url = Url(BuildConstants.MOKT_LOGO_URL),
+        logoDescription: String = "Mokt logo",
+        backgroundUrl: Url = Url(BuildConstants.MOKT_DEVICE_CODE_BACKGROUND),
+        userCodeHint: String = "Enter the code below in your browser",
+        theme: WebTheme = WebTheme.DARK,
+        webPage: HTML.(userCode: String) -> Unit = { userCode -> userCodePage(userCode, title, logoUrl, logoDescription, backgroundUrl, userCodeHint, theme) }
+    ) {
         codeServer = embeddedServer(CIO, localServerUrl.port, localServerUrl.host) {
             val path = localServerUrl.fullPath.ifBlank { "/" }
             userCodeRouting(deviceCodeResponse.userCode, path, webPage)
@@ -110,7 +111,7 @@ public class UserCodeBuilder internal constructor(
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    internal fun build(): EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine. Configuration>? = codeServer
+    internal fun build(): EmbeddedServer<CIOApplicationEngine, CIOApplicationEngine.Configuration>? = codeServer
 }
 
 /**

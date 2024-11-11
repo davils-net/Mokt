@@ -12,6 +12,7 @@
 package dev.redtronics.mokt.html
 
 import dev.redtronics.mokt.build.BuildConstants
+import io.ktor.http.*
 import kotlinx.html.*
 
 /**
@@ -23,20 +24,28 @@ import kotlinx.html.*
  * @since 0.0.1
  * @author Nils Jäkel
  */
-public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
+public fun HTML.userCodePage(
+    userCode: String,
+    title: String,
+    logoUrl: Url,
+    logoDescription: String,
+    backgroundUrl: Url,
+    userCodeHint: String,
+    theme: WebTheme
+) {
     head {
-        title("Device Code")
+        title(title)
     }
 
     body {
         div("card") {
             img(
-                alt = "Mokt full logo",
-                src = BuildConstants.MOKT_LOGO_URL,
+                alt = logoDescription,
+                src = logoUrl.toString(),
                 classes = "mokt"
             )
             div("code") {
-                p { text("Enter the code below in your browser") }
+                p { text(userCodeHint) }
                 h1 { text(userCode) }
             }
         }
@@ -56,7 +65,7 @@ public fun HTML.userCodePage(userCode: String, theme: WebTheme) {
                 }
 
                 body {
-                    background-image: url("${BuildConstants.MOKT_DEVICE_CODE_BACKGROUND}");
+                    background-image: url("$backgroundUrl");
                     background-position: center;
                     background-size: cover;
                     display: flex;
