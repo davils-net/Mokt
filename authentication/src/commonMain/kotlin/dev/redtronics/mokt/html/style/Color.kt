@@ -9,15 +9,11 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt.network
+package dev.redtronics.mokt.html.style
 
-import io.ktor.http.*
-import kotlinx.coroutines.await
-import kotlin.js.Promise
-
-public actual suspend fun openInBrowser(url: Url) {
-    open(url).await()
+public class Color(private val hex: String) {
+    init {
+        require(hex.startsWith("#") && hex.length == 7) { "Invalid hex color: $hex" }
+    }
+    public fun hex(): String = hex
 }
-
-@JsModule("open")
-private external fun open(url: Url): Promise<Unit>

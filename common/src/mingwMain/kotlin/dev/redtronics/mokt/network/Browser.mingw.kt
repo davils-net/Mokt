@@ -17,8 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
-public actual suspend fun openInBrowser(vararg url: Url): Unit = withContext(Dispatchers.IO) {
-    url.forEach {
-        open_url(it.toString())
-    }
+public actual suspend fun openInBrowser(url: Url): Unit = withContext(Dispatchers.IO) {
+    open_url(url.toString())
 }

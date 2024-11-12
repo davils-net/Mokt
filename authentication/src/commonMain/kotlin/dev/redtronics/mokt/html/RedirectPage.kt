@@ -11,26 +11,27 @@
 
 package dev.redtronics.mokt.html
 
+import dev.redtronics.mokt.html.style.Color
 import kotlinx.html.*
 
 /**
  * Simple page to display information as website on redirect.
  *
+ * @param title The title of the page.
+ * @param notice The notice to be displayed.
  * @param textColor The text color to be used.
  * @param firstAccentColor The first accent color to be used.
  * @param secondAccentColor The second accent color to be used.
- * @param title The title of the page.
- * @param notice The notice to be displayed.
  *
  * @since 0.0.1
  * @author Nils Jäkel
  * */
 public fun HTML.redirectPage(
-    textColor: String,
-    firstAccentColor: String,
-    secondAccentColor: String,
     title: String,
-    notice: String
+    notice: String,
+    textColor: Color,
+    firstAccentColor: Color,
+    secondAccentColor: Color
 ) {
     head {
         title(title)
@@ -45,11 +46,10 @@ public fun HTML.redirectPage(
                     justify-content: center;
                     height: 100vh;
                     margin: 0;
-                    color: $textColor;
-                    font-family: 'Arial', sans-serif;
+                    color: ${textColor.hex()};
                     overflow: hidden;
                     position: relative;
-                    background: linear-gradient(45deg, $firstAccentColor, $secondAccentColor);
+                    background: linear-gradient(45deg, ${firstAccentColor.hex()}, ${secondAccentColor.hex()});
                     background-size: 400% 400%;
                     animation: gradientAnimation 20s infinite;
                     text-align: center;

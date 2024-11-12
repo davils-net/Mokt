@@ -36,7 +36,7 @@ import kotlinx.html.HTML
  */
 internal fun Application.grantRouting(
     redirectPath: String,
-    channel: Channel<GrantCodeResponse>,
+    channel: Channel<GrantCodeResponse?>,
     successPage: HTML.() -> Unit,
     failurePage: HTML.() -> Unit,
     onRequestError: suspend (err: CodeErrorResponse) -> Unit
@@ -54,6 +54,9 @@ internal fun Application.grantRouting(
                 )
 
                 call.respondHtml(HttpStatusCode.ExpectationFailed, failurePage)
+                channel.send(null)
+                channel.close()
+
                 onRequestError(oauthErrorCode)
                 return@get
             }

@@ -15,6 +15,7 @@ package dev.redtronics.mokt.builder.grant
 
 import dev.redtronics.mokt.*
 import dev.redtronics.mokt.html.redirectPage
+import dev.redtronics.mokt.html.style.Color
 import dev.redtronics.mokt.network.openInBrowser
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.GrantCodeResponse
@@ -82,26 +83,17 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
     public var state: String = generateRandomIdentifier()
 
     /**
-     * Checks if the local redirect URL is using HTTPS.
-     * If this is not the case, the validation check will throw an exception.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public var requireHttpsByRedirect: Boolean = false
-
-    /**
      * The page that will be shown after a successful authorization.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
     public var successRedirectPage: HTML.() -> Unit = { redirectPage(
-        "#ffffff",
-        "#009320",
-        "#bcff00",
         "Authentication successful",
-        "You can close this page now!"
+        "You can close this page now!",
+        Color("#ffffff"),
+        Color("#009320"),
+        Color("#009320")
     ) }
 
     /**
@@ -111,11 +103,11 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
      * @author Nils Jäkel
      * */
     public var failureRedirectPage: HTML.() -> Unit = { redirectPage(
-        "#ffffff",
-        "#b20000",
-        "#ff0000",
         "Authentication failed",
-        "Please try again!"
+        "Please try again!",
+        Color("#ffffff"),
+        Color("#ff0000"),
+        Color("#b20000")
     ) }
 
     /**
@@ -130,8 +122,8 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
     public suspend fun requestGrantCode(
         browser: suspend (url: Url) -> Unit = { url -> openInBrowser(url) },
         onRequestError: suspend (err: CodeErrorResponse) -> Unit = {}
-    ): GrantCodeResponse {
-        val authCodeChannel: Channel<GrantCodeResponse> = Channel()
+    ): GrantCodeResponse? {
+        val authCodeChannel: Channel<GrantCodeResponse?> = Channel()
         val path = localRedirectUrl.fullPath.ifBlank { "/" }
 
         val authServer = embeddedServer(CIO, localRedirectUrl.port, localRedirectUrl.host) {
@@ -190,8 +182,8 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
                     append("client_secret", provider.clientSecret!!)
                 }
 
-                additionalParameters.forEach {
-                    append(it.key, it.value)
+                additionalParameters.forEach { (key, value) ->
+                    append(key, value)
                 }
             }
         )

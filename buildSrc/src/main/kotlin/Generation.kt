@@ -18,7 +18,7 @@ internal fun BuildConstantsConfiguration.buildConstantDir(project: Project) = pr
 
 internal fun generateBuildConstants(project: Project, buildConstantsConfiguration: BuildConstantsConfiguration) {
     val content = buildConstantsConfiguration.properties.get().entries.joinToString("\n") {
-        "    public const val ${it.key} = \"${it.value}\""
+        "    const val ${it.key} = \"${it.value}\""
     }
     val generatedDir = buildConstantsConfiguration.buildConstantDir(project)
     generatedDir.mkdirs()
