@@ -21,6 +21,7 @@ tasks {
         group = Project.NAME.lowercase()
         description = "Generates cinterop def files for all supported operating system platforms."
 
+        project.patchVersion()
         project.compileRustBindings()
         project.generateCInteropDefFiles()
     }

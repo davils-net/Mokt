@@ -25,8 +25,7 @@ plugins {
 }
 
 version =
-    System.getenv(/* name = */ "CI_COMMIT_TAG") ?: System.getenv(/* name = */ "CI_COMMIT_SHORT_SHA")?.let { "$it-dev" }
-            ?: "0.0.0"
+    System.getenv(/* name = */ "CI_COMMIT_TAG") ?: System.getenv(/* name = */ "CI_COMMIT_SHORT_SHA")?.let { "$it-dev" } ?: "0.0.0"
 
 repositories {
     mavenCentral()
@@ -56,7 +55,7 @@ tasks {
         description = "Patches the docs and rust version."
 
         doFirst {
-            patchVersions(project)
+            project.patchVersion()
         }
     }
 

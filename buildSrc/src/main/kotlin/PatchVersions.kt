@@ -12,8 +12,7 @@
 
 import org.gradle.api.Project
 
-internal fun patchVersions(project: Project) {
-    val rootProject = project.rootProject
+internal fun Project.patchVersion() {
     val writersideCfg = rootProject.file("docs/writerside.cfg")
     val cargoToml = rootProject.file("mokt-rust-bindings/Cargo.toml")
     val files = listOf(writersideCfg, cargoToml)
