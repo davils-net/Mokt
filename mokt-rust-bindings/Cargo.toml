@@ -1,5 +1,9 @@
 [package]
 name = "mokt-rust-bindings"
+description = "Native Rust bindings for Mokt."
+authors = ["Nils Jäkel <nils.jaekel@redtronics.dev>", "David Ernst <david.ernst@redtronics.dev>"]
+license = "MIT"
+readme = "../README.md"
 version = "0.1.0"
 edition = "2021"
 
