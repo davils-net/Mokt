@@ -114,6 +114,7 @@ kotlin {
                 api(libs.ktor.client.cio)
 
                 api(libs.slf4j.api)
+                api(libs.logback.classic)
             }
         }
 
