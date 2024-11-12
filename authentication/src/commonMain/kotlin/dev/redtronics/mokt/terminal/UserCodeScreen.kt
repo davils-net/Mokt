@@ -11,23 +11,28 @@
 
 package dev.redtronics.mokt.terminal
 
-import com.github.ajalt.mordant.rendering.TextAlign
 import com.github.ajalt.mordant.terminal.Terminal
-import com.github.ajalt.mordant.widgets.Text
 import io.ktor.http.*
 
+/**
+ * Simple screen to print the user code in the terminal.
+ *
+ * @param userCode The user code to display
+ * @param title The title of the screen
+ * @param userCodeHint The step to take next.
+ * @param verificationUrl The url that is needed to enter the user code.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public fun Terminal.userCodeScreen(
     userCode: String,
     title: String,
     userCodeHint: String,
     verificationUrl: Url
 ) {
-    val headline = Text(
-        title,
-        align = TextAlign.CENTER
-    )
-
-    this.println(
-        headline
-    )
+    println(title)
+    println(userCodeHint)
+    println(userCode)
+    println(verificationUrl.toString())
 }
