@@ -11,6 +11,12 @@
 
 import org.gradle.api.Project
 
+/**
+ * Patches the version in writerside.cfg and Cargo.toml
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 internal fun Project.patchVersion() {
     val writersideCfg = rootProject.file("docs/writerside.cfg")
     val cargoToml = rootProject.file("mokt-rust-bindings/Cargo.toml")
