@@ -1,25 +1,16 @@
+/*
+ * MIT License
+ * Copyright 2024 Nils Jäkel & David Ernst
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the “Software”),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software.
+ */
+
 package dev.redtronics
 
-import dev.redtronics.mokt.network.openInBrowser
-import io.ktor.http.*
 import kotlinx.coroutines.supervisorScope
 
-suspend fun main(): Unit = supervisorScope {
-//    keycloakAuth(
-//        "test-read-token",
-//        "I5Xx0DCnUvmK5D484wppaiEmpaLRJeAx",
-//        "huebcraft",
-//        Url("https://keycloak.huebcraft.net")
-//    ) {
-//        scopes = listOf(Scope.PROFILE, Scope.OPENID, Scope.EMAIL)
-//         grant {
-//             val code = this.requestGrantCode() {
-//                 println(it.errorDescription)
-//             }
-//             val token = requestAccessToken(code)
-//             println(token)
-//         }
-//
-//    }
-    openInBrowser(Url("https://code.redtronics.dev"))
-}
+suspend fun main(): Unit = supervisorScope {}
