@@ -16,7 +16,7 @@ internal fun Project.patchVersion() {
     val writersideCfg = rootProject.file("docs/writerside.cfg")
     val cargoToml = rootProject.file("mokt-rust-bindings/Cargo.toml")
     val files = listOf(writersideCfg, cargoToml)
-    val toPatchedVersion = System.getenv(/* name = */ "CI_COMMIT_TAG") ?: System.getenv(/* name = */ "CI_COMMIT_SHORT_SHA")?.let { "$it-dev" } ?: "0.0.0"
+    val toPatchedVersion = System.getenv(/* name = */ "CI_COMMIT_TAG") ?: "0.0.0"
 
     files.forEach { file ->
         val content = file.readText()
