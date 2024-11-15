@@ -24,6 +24,11 @@ public actual suspend fun openInBrowser(url: Url): Unit = withContext(Dispatcher
             Desktop.getDesktop().browse(url.toURI())
         }
 
+        OsType.MACOS -> {
+            val process = ProcessBuilder("open", url.toString())
+            process.start()
+        }
+
         else -> {
             val process = ProcessBuilder("xdg-open", url.toString())
             process.start()
