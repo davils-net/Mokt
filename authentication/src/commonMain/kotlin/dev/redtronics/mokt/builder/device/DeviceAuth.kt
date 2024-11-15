@@ -151,7 +151,7 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun requestAuthorizationCode(
+    public suspend fun authorizationCode(
         additionalParameters: Map<String, String> = mapOf(),
         onRequestError: suspend (err: CodeErrorResponse) -> Unit = {}
     ): DeviceCodeResponse? {
@@ -187,7 +187,7 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun requestAccessToken(
+    public suspend fun accessToken(
         deviceCodeResponse: DeviceCodeResponse,
         additionalParameters: Map<String, String> = mapOf(),
         onRequestError: suspend (err: DeviceAuthStateError) -> Unit = {}
@@ -206,14 +206,14 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun requestAccessToken(
+    public suspend fun accessToken(
         deviceCodeResponse: DeviceCodeResponse,
         additionalParameters: Map<String, String> = mapOf(),
         displayUserCode: suspend UserCodeBuilder.() -> Unit = {},
         onRequestError: suspend (err: DeviceAuthStateError) -> Unit = {}
     ): AccessResponse? {
         displayCode(deviceCodeResponse, displayUserCode)
-        return requestAccessToken(deviceCodeResponse, additionalParameters, onRequestError)
+        return accessToken(deviceCodeResponse, additionalParameters, onRequestError)
     }
 
     /**

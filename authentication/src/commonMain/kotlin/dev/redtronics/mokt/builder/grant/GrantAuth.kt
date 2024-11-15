@@ -119,7 +119,7 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun requestGrantCode(
+    public suspend fun grantCode(
         browser: suspend (url: Url) -> Unit = { url -> openInBrowser(url) },
         onRequestError: suspend (err: CodeErrorResponse) -> Unit = {}
     ): GrantCodeResponse? {
@@ -163,7 +163,7 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun requestAccessToken(
+    public suspend fun accessToken(
         grantCode: GrantCodeResponse,
         additionalParameters: Map<String, String> = mapOf(),
         onRequestError: suspend (response: HttpResponse) -> Unit = {}
