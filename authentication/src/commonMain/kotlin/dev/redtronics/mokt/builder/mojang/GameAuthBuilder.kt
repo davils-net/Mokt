@@ -12,6 +12,7 @@
 package dev.redtronics.mokt.builder.mojang
 
 import io.ktor.client.*
+import io.ktor.client.statement.*
 import kotlinx.serialization.json.Json
 
 /**
@@ -20,7 +21,28 @@ import kotlinx.serialization.json.Json
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public abstract class MinecraftAuthBuilder {
+public abstract class GameAuthBuilder {
+    /**
+     * The http client from the configured provider.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     internal abstract val httpClient: HttpClient
+
+    /**
+     * The json serializer instance from the configured provider.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     internal abstract val json: Json
+
+    /**
+     * The method to request the authentication data from the provider.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    internal abstract suspend fun requestAuthData(): HttpResponse
 }
