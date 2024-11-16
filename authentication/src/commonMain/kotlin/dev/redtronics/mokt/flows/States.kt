@@ -18,6 +18,12 @@ package dev.redtronics.mokt.flows
  * @author Nils Jäkel
  * */
 public interface AuthState {
+    /**
+     * The description of the state.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
     public val description: String
 }
 
@@ -36,8 +42,14 @@ public enum class OAuthState(override val description: String) : AuthState {
     REQUEST_REFRESH_TOKEN("Request refresh token from microsoft");
 }
 
-public enum class MinecraftAuthState(override val description: String) : AuthState {
-    REQUEST_XBOX_ACCESS_TOKEN("Request XBox access token"),
-    REQUEST_XSTS_ACCESS_TOKEN("Request xsts access token"),
+/**
+ * Contains all game auth states.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
+public enum class GameAuthState(override val description: String) : AuthState {
+    REQUEST_XBOX_TOKEN("Request XBox access token"),
+    REQUEST_XSTS_TOKEN("Request xsts access token"),
     REQUEST_MOJANG_TOKEN("Request mojang access token");
 }
