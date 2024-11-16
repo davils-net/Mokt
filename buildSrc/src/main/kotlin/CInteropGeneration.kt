@@ -21,12 +21,11 @@ import java.nio.file.Path
  * @author Nils Jäkel
  */
 internal fun GradleProject.compileRustBindings() {
-    val workDir = file("../mokt-rust-bindings")
+    val moktRustBindsDir = rootProject.file("mokt-rust-bindings")
 
-    exec {
-        workingDir = workDir
-        commandLine = listOf("cargo", "build", "--release")
-    }
+    val process = ProcessBuilder("cargo", "build", "--release")
+    process.directory(moktRustBindsDir)
+    process.start().waitFor()
 }
 
 /**
