@@ -26,14 +26,14 @@ import kotlinx.serialization.Serializable
  * @author Nils Jäkel
  * */
 @Serializable
-public sealed interface AuthData {
+public sealed class AuthData : FlowData() {
     /**
      * The generic access response from any provider.
      *
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public var accessResponse: AccessResponse?
+    public abstract var accessResponse: AccessResponse?
 }
 
 /**
@@ -59,7 +59,7 @@ public abstract class GrantAuthData(
      * @author Nils Jäkel
      * */
     public var grantCodeResponse: GrantCodeResponse? = null
-) : FlowData(), AuthData
+) : AuthData()
 
 /**
  * Flow data for the device authentication.
@@ -84,7 +84,7 @@ public abstract class DeviceAuthData(
      * @author Nils Jäkel
      * */
     public var deviceCodeResponse: DeviceCodeResponse? = null
-) : FlowData(), AuthData
+) : AuthData()
 
 /**
  * The flow data for the game authentication.

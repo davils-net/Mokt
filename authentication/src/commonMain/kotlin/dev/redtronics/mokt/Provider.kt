@@ -11,6 +11,7 @@
 
 package dev.redtronics.mokt
 
+import dev.redtronics.mokt.flows.*
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
 import dev.redtronics.mokt.response.AccessResponse
@@ -18,6 +19,8 @@ import io.ktor.client.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.serialization.json.Json
 
 /**
@@ -98,8 +101,59 @@ public abstract class Provider {
     public suspend fun accessTokenFromRefreshToken(
         refreshToken: String,
         additionalParameters: Map<String, String> = mapOf(),
-        onRequestError: suspend (response: HttpResponse) -> Unit = {}
+        onRequestError: suspend (response: HttpResponse) -> Unit = {},
     ): AccessResponse? {
+        val response = submitAccessForm(refreshToken, additionalParameters)
+        if (!response.status.isSuccess()) {
+            onRequestError(response)
+            return null
+        }
+
+        return json.decodeFromString(AccessResponse.serializer(), response.bodyAsText())
+    }
+
+    /**
+     * Requests an access token from the given refresh token.
+     *
+     * @param refreshToken The refresh token.
+     * @param additionalParameters The additional parameters to be appended to the request.
+     * @param onRequestError The function to be called if an error occurs during the access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    public fun <T : AuthData> accessTokenFromRefreshToken(
+        refreshToken: String,
+        additionalParameters: Map<String, String> = mapOf(),
+        onRequestError: suspend (response: HttpResponse, flowData: T) -> Unit = { _, flowData: T -> flowData.cancel() },
+    ): FlowStep<T, AuthProgress<OAuthState>> = object : FlowStep<T, AuthProgress<OAuthState>> {
+        override suspend fun execute(flowData: T): Flow<AuthProgress<OAuthState>> = channelFlow {
+            send(AuthProgress(1, 2, OAuthState.REQUEST_ACCESS_TOKEN))
+            val response = submitAccessForm(refreshToken, additionalParameters)
+            if (!response.status.isSuccess()) {
+                onRequestError(response, flowData)
+                return@channelFlow
+            }
+
+            val accessResponse = json.decodeFromString(AccessResponse.serializer(), response.bodyAsText())
+            flowData.accessResponse = accessResponse
+            send(AuthProgress(2, 2, OAuthState.REQUEST_ACCESS_TOKEN))
+        }
+    }
+
+    /**
+     * Requests an access token from the given refresh token.
+     *
+     * @param refreshToken The refresh token.
+     * @param additionalParameters The additional parameters to be appended to the request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    private suspend fun submitAccessForm(
+        refreshToken: String,
+        additionalParameters: Map<String, String> = mapOf(),
+    ): HttpResponse {
         val response = httpClient.submitForm(
             url = tokenEndpointUrl.toString(),
             formParameters = parameters {
@@ -117,13 +171,7 @@ public abstract class Provider {
                 }
             }
         )
-
-        if (!response.status.isSuccess()) {
-            onRequestError(response)
-            return null
-        }
-
-        return json.decodeFromString(AccessResponse.serializer(), response.bodyAsText())
+        return response
     }
 }
 
@@ -142,7 +190,7 @@ public abstract class Provider {
 public suspend fun microsoftAuth(
     clientId: String,
     clientSecret: String? = getEnv("MICROSOFT_CLIENT_SECRET"),
-    builder: suspend Microsoft.() -> Unit
+    builder: suspend Microsoft.() -> Unit,
 ): Microsoft = Microsoft(clientId, clientSecret).apply { builder() }
 
 /**
@@ -216,7 +264,7 @@ public suspend fun keycloakAuth(
     realm: String,
     instanceUrl: Url,
     httpClient: HttpClient = client,
-    json: Json = defaultJson
+    json: Json = defaultJson,
 ): Keycloak = keycloakAuth(clientId, clientSecret, realm, instanceUrl) {
     this.httpClient = httpClient
     this.json = json
