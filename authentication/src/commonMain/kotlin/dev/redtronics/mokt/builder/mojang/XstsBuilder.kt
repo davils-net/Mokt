@@ -13,6 +13,7 @@
 
 package dev.redtronics.mokt.builder.mojang
 
+import dev.redtronics.mokt.flows.GameAuthData
 import dev.redtronics.mokt.payload.XstsPayload
 import dev.redtronics.mokt.payload.XstsProperties
 import dev.redtronics.mokt.response.mojang.XBoxResponse
@@ -40,7 +41,7 @@ public class XstsBuilder internal constructor(
      * @author Nils Jäkel
      * */
     private val xBoxResponse: XBoxResponse
-) : MinecraftAuthBuilder() {
+) : GameAuthBuilder() {
     /**
      * The sandbox id of the payload.
      *
@@ -77,6 +78,40 @@ public class XstsBuilder internal constructor(
      * @author Nils Jäkel
      * */
     internal suspend fun build(onRequestError: suspend (response: HttpResponse) -> Unit): XstsResponse?  {
+        val response = requestAuthData()
+        if (!response.status.isSuccess()) {
+            onRequestError(response)
+            return null
+        }
+
+        return json.decodeFromString(XstsResponse.serializer(), response.bodyAsText())
+    }
+
+    /**
+     * Executes the xsts token access response.
+     *
+     * @param onRequestError The function to be called if an error occurs during the xsts access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    internal suspend fun <T : GameAuthData> build(flowData: T, onRequestError: suspend (response: HttpResponse, flowData: T) -> Unit): XstsResponse?  {
+        val response = requestAuthData()
+        if (!response.status.isSuccess()) {
+            onRequestError(response, flowData)
+            return null
+        }
+
+        return json.decodeFromString(XstsResponse.serializer(), response.bodyAsText())
+    }
+
+    /**
+     * Executes the xsts token access response.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    override suspend fun requestAuthData(): HttpResponse {
         val xstsPayload = XstsPayload(
             properties = XstsProperties(
                 sandboxId = sandboxId,
@@ -91,13 +126,7 @@ public class XstsBuilder internal constructor(
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(XstsPayload.serializer(), xstsPayload))
         }
-
-        if (!response.status.isSuccess()) {
-            onRequestError(response)
-            return null
-        }
-
-        return json.decodeFromString(XstsResponse.serializer(), response.bodyAsText())
+        return response
     }
 }
 
