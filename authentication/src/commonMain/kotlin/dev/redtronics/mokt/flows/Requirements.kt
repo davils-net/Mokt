@@ -13,12 +13,33 @@ package dev.redtronics.mokt.flows
 
 import dev.redtronics.mokt.response.AccessResponse
 import dev.redtronics.mokt.response.GrantCodeResponse
+import dev.redtronics.mokt.response.device.DeviceCodeResponse
+import kotlinx.serialization.Serializable
 
+/**
+ * The base data, which is used for all flows.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
+@Serializable
+public sealed interface AuthData {
+    public val accessResponse: AccessResponse?
+}
+
+@Serializable
 public abstract class GrantAuthData(
-    public var grantCodeResponse: GrantCodeResponse? = null,
-    public var accessResponse: AccessResponse? = null
-) : FlowData()
+    override var accessResponse: AccessResponse? = null,
+    public var grantCodeResponse: GrantCodeResponse? = null
+) : FlowData(), AuthData
 
+@Serializable
+public abstract class DeviceAuthData(
+    override var accessResponse: AccessResponse? = null,
+    public var deviceCodeResponse: DeviceCodeResponse? = null
+) : FlowData(), AuthData
+
+@Serializable
 public data class AuthProgress<out T : AuthState>(
     override val currentStep: Int,
     override val totalSteps: Int,
