@@ -95,7 +95,7 @@ public abstract class Provider {
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun requestAccessTokenFromRefreshToken(
+    public suspend fun accessTokenFromRefreshToken(
         refreshToken: String,
         additionalParameters: Map<String, String> = mapOf(),
         onRequestError: suspend (response: HttpResponse) -> Unit = {}
