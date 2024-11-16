@@ -11,12 +11,24 @@
 
 package dev.redtronics.mokt.flows
 
+/**
+ * Base interface for all authentication states.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public interface AuthState {
     public val description: String
 }
 
+/**
+ * Contains all oauth states.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
 public enum class OAuthState(override val description: String) : AuthState {
-    REQUEST_DEVICE_CODE("Request device code"),
+    REQUEST_USER_CODE("Request device code"),
     REQUEST_GRANT_CODE("Request grant code"),
     DISPLAY_USER_CODE("Display user code"),
     AUTHORIZE_PENDING_USER_CODE("Authorize pending user code"),
