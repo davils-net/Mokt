@@ -265,6 +265,7 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
 
             val response = submitAccessForm(flowData.grantCodeResponse!!, additionalParameters)
             if (!response.status.isSuccess()) {
+                send(AuthProgress(2, 2, OAuthState.REQUEST_ACCESS_TOKEN))
                 onRequestError(response, flowData)
                 return@channelFlow
             }
