@@ -175,26 +175,6 @@ public abstract class Provider {
         )
         return response
     }
-
-    /**
-     * Requests an access token from the given refresh token.
-     *
-     * @param data The data to be used in the flow.
-     * @param refreshToken The refresh token.
-     * @param steps The steps to be executed in the flow.
-     *
-     * @since 0.0.1
-     * @author Nils Jäkel
-     * */
-    public suspend fun <T : AuthData> refreshFlow(
-        data: T,
-        refreshToken: String,
-        vararg steps: FlowStep<T, AuthProgress<OAuthState>> = arrayOf(accessTokenFromRefreshToken<T>(refreshToken)),
-    ): Flow<AuthProgress<OAuthState>> = flow(data) {
-        steps.forEach {
-            step(it)
-        }
-    }
 }
 
 /**
