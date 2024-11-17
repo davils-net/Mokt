@@ -45,6 +45,13 @@ publishing {
                     }
                 }
 
+                contributors {
+                    contributor {
+                        name = "Lars Ultsch"
+                        timezone = "Europe/Berlin"
+                    }
+                }
+
                 ciManagement {
                     system = "Gitlab"
                 }

@@ -33,6 +33,14 @@ pub extern "C" fn open_url(url: *const c_char) {
         return;
     }
 
+    if cfg!(target_os = "macos") {
+        Command::new("open")
+            .arg(url)
+            .spawn()
+            .expect("failed to execute process");
+        return;
+    }
+
     Command::new("sh")
         .arg("-c")
         .arg("xdg-open")

@@ -11,6 +11,7 @@
 
 package dev.redtronics.mokt.server
 
+import dev.redtronics.mokt.flows.GrantAuthData
 import dev.redtronics.mokt.response.GrantCodeResponse
 import dev.redtronics.mokt.response.device.CodeError
 import dev.redtronics.mokt.response.device.CodeErrorResponse
@@ -39,7 +40,7 @@ internal fun Application.grantRouting(
     channel: Channel<GrantCodeResponse?>,
     successPage: HTML.() -> Unit,
     failurePage: HTML.() -> Unit,
-    onRequestError: suspend (err: CodeErrorResponse) -> Unit
+    onRequestError: suspend (err: CodeErrorResponse) -> Unit,
 ) {
     routing {
         get(redirectPath) {
@@ -47,17 +48,8 @@ internal fun Application.grantRouting(
             val state = call.request.queryParameters["state"]
 
             if (code == null || state == null) {
-                val queryParams = call.request.queryParameters
-                val oauthErrorCode = CodeErrorResponse(
-                    error = CodeError.byName(queryParams["error"]!!),
-                    errorDescription = queryParams["error_description"]!!
-                )
-
-                call.respondHtml(HttpStatusCode.ExpectationFailed, failurePage)
-                channel.send(null)
-                channel.close()
-
-                onRequestError(oauthErrorCode)
+                val errorCode = handleErrorRedirect(call, channel, failurePage)
+                onRequestError(errorCode)
                 return@get
             }
 
@@ -68,6 +60,75 @@ internal fun Application.grantRouting(
             channel.close()
         }
     }
+}
+
+/**
+ * Routing module for the ktor server to handle the redirect from the grant authentication flow by any
+ * provider.
+ *
+ * @param redirectPath The path to be routed to. E.g. "/callback"
+ * @param channel The coroutine channel to send the grant code response to.
+ * @param successPage The success page to be displayed if the request was successful.
+ * @param failurePage The failure page to be displayed if the request was not successful.
+ * @param onRequestError The function to be called if an error occurs during the request.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
+internal fun <T : GrantAuthData> Application.grantRoutingWithFlow(
+    redirectPath: String,
+    channel: Channel<GrantCodeResponse?>,
+    successPage: HTML.() -> Unit,
+    failurePage: HTML.() -> Unit,
+    flowData: T,
+    onRequestError: suspend (err: CodeErrorResponse, flowData: T) -> Unit,
+) {
+    routing {
+        get(redirectPath) {
+            val code = call.request.queryParameters["code"]
+            val state = call.request.queryParameters["state"]
+
+            if (code == null || state == null) {
+                val errorCode = handleErrorRedirect(call, channel, failurePage)
+                onRequestError(errorCode, flowData)
+                return@get
+            }
+
+            val grantCodeResponse = GrantCodeResponse(code, state)
+            call.respondHtml(HttpStatusCode.OK, successPage)
+
+            channel.send(grantCodeResponse)
+            channel.close()
+        }
+    }
+}
+
+/**
+ * Handles the error redirect from the grant authentication flow by any provider.
+ *
+ * @param call The routing call.
+ * @param channel The coroutine channel to send the grant code response to.
+ * @param failurePage The failure page to be displayed if the request was not successful.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
+private suspend fun handleErrorRedirect(
+    call: RoutingCall,
+    channel: Channel<GrantCodeResponse?>,
+    failurePage: HTML.() -> Unit,
+): CodeErrorResponse {
+    val parameters = call.request.queryParameters
+    val oauthErrorCode = CodeErrorResponse(
+        error = CodeError.byName(parameters["error"]!!),
+        errorDescription = parameters["error_description"]!!
+    )
+
+    call.respondHtml(HttpStatusCode.ExpectationFailed, failurePage)
+    channel.send(null)
+    channel.close()
+
+    return oauthErrorCode
 }
 
 /**
@@ -83,7 +144,7 @@ internal fun Application.grantRouting(
 internal fun Application.userCodeRouting(
     userCode: String,
     displayPath: String,
-    userCodePage: HTML.(userCode: String) -> Unit
+    userCodePage: HTML.(userCode: String) -> Unit,
 ) {
     routing {
         get(displayPath) {

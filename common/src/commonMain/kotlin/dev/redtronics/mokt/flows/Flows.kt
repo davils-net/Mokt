@@ -32,12 +32,12 @@ public abstract class FlowProgress {
     public abstract val totalSteps: Int
     public var stepProgress: Double? = null
 
-    private val parallelProgress = atomic(0)
+//    private val parallelProgress = atomic(0)
 
     public val progress: Int
         get() {
             require(value = totalSteps > 0 && currentStep > 0) { "Total steps and current step must be greater than 0" }
-            if (parallelProgress.value != 0) return parallelProgress.value
+//            if (parallelProgress.value != 0) return parallelProgress.value
 
             if (stepProgress == null) {
                 return (currentStep.toDouble() / totalSteps.toDouble() * 100).toInt()
@@ -47,9 +47,9 @@ public abstract class FlowProgress {
             return progress.toInt()
         }
 
-    internal fun incrementParallelProgress(progress: Int) {
-        parallelProgress.value = progress
-    }
+//    internal fun incrementParallelProgress(progress: Int) {
+//        parallelProgress.value = progress
+//    }
 }
 
 public interface FlowStep<T : FlowData, R : FlowProgress> {

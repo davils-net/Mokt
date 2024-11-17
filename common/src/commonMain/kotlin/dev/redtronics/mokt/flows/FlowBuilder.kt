@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 public class FlowBuilder<T : FlowData, R : FlowProgress> internal constructor(maxParallelism: Int) {
     private val dispatcher = Dispatchers.Default.limitedParallelism(maxParallelism)
     private val steps = mutableListOf<FlowStep<T, R>>()
-    private val parallelProgressList = atomic(mutableListOf<Int>())
+//    private val parallelProgressList = atomic(mutableListOf<Int>())
 
     public fun step(flowStep: FlowStep<T, R>): FlowStep<T, R> = flowStep.also { steps.add(it) }
 
@@ -38,38 +38,38 @@ public class FlowBuilder<T : FlowData, R : FlowProgress> internal constructor(ma
         return step.also { steps.add(it) }
     }
 
-    public fun parallelStep(vararg flowSteps: FlowStep<T, R>): FlowStep<T, R> {
-        val step = object : FlowStep<T, R> {
-            override suspend fun execute(flowData: T): Flow<R> = channelFlow {
+//    public fun parallelStep(vararg flowSteps: FlowStep<T, R>): FlowStep<T, R> {
+//        val step = object : FlowStep<T, R> {
+//            override suspend fun execute(flowData: T): Flow<R> = channelFlow {
+//
+//                val stepJobs = flowSteps.map { flowStep ->
+//                    CoroutineScope(dispatcher).launch {
+//                        flowStep.execute(flowData).collect {
+//                            parallelProgressList.value.add(it.progress)
+//                            val progress = parallelProgressList.value.sumOf { num -> num } / flowSteps.size
+//
+//                            it.incrementParallelProgress(progress)
+//                            send(it)
+//                        }
+//                    }
+//                }
+//                stepJobs.joinAll()
+//            }
+//        }
+//        return step.also { steps.add(it) }
+//    }
 
-                val stepJobs = flowSteps.map { flowStep ->
-                    CoroutineScope(dispatcher).launch {
-                        flowStep.execute(flowData).collect {
-                            parallelProgressList.value.add(it.progress)
-                            val progress = parallelProgressList.value.sumOf { num -> num } / flowSteps.size
-
-                            it.incrementParallelProgress(progress)
-                            send(it)
-                        }
-                    }
-                }
-                stepJobs.joinAll()
-            }
-        }
-        return step.also { steps.add(it) }
-    }
-
-    public fun conditionalParallelStep(vararg flowSteps: FlowStep<T, R>, condition: (T) -> Boolean): FlowStep<T, R> {
-        val step = object : FlowStep<T, R> {
-            override suspend fun execute(flowData: T): Flow<R> {
-                if (condition(flowData)) {
-                    return parallelStep(*flowSteps).execute(flowData)
-                }
-                return channelFlow { }
-            }
-        }
-        return step.also { steps.add(it) }
-    }
+//    public fun conditionalParallelStep(vararg flowSteps: FlowStep<T, R>, condition: (T) -> Boolean): FlowStep<T, R> {
+//        val step = object : FlowStep<T, R> {
+//            override suspend fun execute(flowData: T): Flow<R> {
+//                if (condition(flowData)) {
+//                    return parallelStep(*flowSteps).execute(flowData)
+//                }
+//                return channelFlow { }
+//            }
+//        }
+//        return step.also { steps.add(it) }
+//    }
 
     internal fun build(data: T, onCancel: suspend () -> Unit, onError: suspend () -> Unit) = channelFlow {
         steps.forEach { step ->

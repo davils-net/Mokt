@@ -15,6 +15,7 @@ package dev.redtronics.mokt
 
 import dev.redtronics.mokt.builder.device.KeycloakDeviceBuilder
 import dev.redtronics.mokt.builder.grant.KeycloakGrantBuilder
+import dev.redtronics.mokt.flows.*
 import dev.redtronics.mokt.network.client
 import dev.redtronics.mokt.network.defaultJson
 import dev.redtronics.mokt.network.div
@@ -23,6 +24,8 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.serialization.json.Json
 
 /**
@@ -159,22 +162,68 @@ public class Keycloak internal constructor(
      * @since 0.0.1
      * @author Nils Jäkel
      * */
-    public suspend fun requestMicrosoftAccessToken(
+    public suspend fun microsoftAccessToken(
         accessResponse: AccessResponse,
         onRequestError: suspend (response: HttpResponse) -> Unit = {},
     ): AccessResponse? {
-        val response = httpClient.get(keycloakMsTokenEndpoint) {
-            headers {
-                contentType(ContentType.Application.Json)
-                bearerAuth(accessResponse.accessToken)
-            }
-        }
-
+        val response = submitMicrosoftAccessForm(accessResponse)
         if (!response.status.isSuccess()) {
             onRequestError(response)
             return null
         }
 
         return json.decodeFromString(AccessResponse.serializer(), response.bodyAsText())
+    }
+
+    /**
+     * Requests the microsoft access token from the keycloak token endpoint.
+     *
+     * @param onRequestError The function to be called if an error occurs during the microsoft access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    public fun <T : KeycloakAuthData> microsoftAccessToken(
+        onRequestError: suspend (response: HttpResponse, flowData: T) -> Unit = { _, flowData -> flowData.cancel() },
+    ): FlowStep<T, AuthProgress<OAuthState>> = object : FlowStep<T, AuthProgress<OAuthState>> {
+        override suspend fun execute(flowData: T): Flow<AuthProgress<OAuthState>> = channelFlow {
+            send(AuthProgress(1, 2, OAuthState.REQUEST_ACCESS_TOKEN))
+            if (flowData.accessResponse == null) {
+                send(AuthProgress(2, 2, OAuthState.REQUEST_ACCESS_TOKEN))
+                return@channelFlow
+            }
+
+            val accessResponse = flowData.accessResponse!!
+            val response = submitMicrosoftAccessForm(accessResponse)
+            if (!response.status.isSuccess()) {
+                send(AuthProgress(2, 2, OAuthState.REQUEST_ACCESS_TOKEN))
+                onRequestError(response, flowData)
+                return@channelFlow
+            }
+
+            val microsoftAccessResponse= json.decodeFromString(AccessResponse.serializer(), response.bodyAsText())
+            flowData.microsoftAccessResponse = microsoftAccessResponse
+            send(AuthProgress(2, 2, OAuthState.REQUEST_ACCESS_TOKEN))
+        }
+    }
+
+    /**
+     * Requests the microsoft access token from the keycloak token endpoint.
+     *
+     * @param accessResponse The keycloak access token response.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    private suspend fun submitMicrosoftAccessForm(
+        accessResponse: AccessResponse
+    ): HttpResponse {
+        val response = httpClient.get(keycloakMsTokenEndpoint) {
+            headers {
+                contentType(ContentType.Application.Json)
+                bearerAuth(accessResponse.accessToken)
+            }
+        }
+        return response
     }
 }

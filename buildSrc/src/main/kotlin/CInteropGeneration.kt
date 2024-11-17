@@ -15,18 +15,19 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
 import java.nio.file.Path
 
 /**
- * Compiles the C++ bindings for the cinterop.
+ * Compiles the C bindings for the cinterop.
  *
  * @since 0.0.1
  * @author Nils Jäkel
  */
 internal fun GradleProject.compileRustBindings() {
-    val workDir = file("../mokt-rust-bindings")
+    val moktRustBindsDir = rootProject.file("mokt-rust-bindings")
 
-    exec {
-        workingDir = workDir
-        commandLine = listOf("cargo", "build", "--release")
-    }
+    val builder = ProcessBuilder("cargo", "build", "--release")
+    builder.directory(moktRustBindsDir)
+
+    val process = builder.start()
+    process.waitFor()
 }
 
 /**

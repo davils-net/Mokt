@@ -13,6 +13,7 @@
 
 package dev.redtronics.mokt.builder.mojang
 
+import dev.redtronics.mokt.flows.GameAuthData
 import dev.redtronics.mokt.payload.MojangPayload
 import dev.redtronics.mokt.response.mojang.MojangResponse
 import dev.redtronics.mokt.response.mojang.XstsResponse
@@ -39,7 +40,7 @@ public class MojangBuilder internal constructor(
      * @author Nils Jäkel
      * */
     private val xstsResponse: XstsResponse
-) : MinecraftAuthBuilder() {
+) : GameAuthBuilder() {
     /**
      * The login endpoint of the Mojang API. `https://api.minecraftservices.com/authentication/login_with_xbox`
      *
@@ -58,6 +59,40 @@ public class MojangBuilder internal constructor(
      * @author Nils Jäkel
      * */
     internal suspend fun build(onRequestError: suspend (response: HttpResponse) -> Unit): MojangResponse? {
+        val response = requestAuthData()
+        if (!response.status.isSuccess()) {
+            onRequestError(response)
+            return null
+        }
+
+        return json.decodeFromString(MojangResponse.serializer(), response.bodyAsText())
+    }
+
+    /**
+     * Executes the mojang access token request.
+     *
+     * @param onRequestError The function to be called if an error occurs during the mojang access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    internal suspend fun <T : GameAuthData> build(flowData: T, onRequestError: suspend (response: HttpResponse, flowData: T) -> Unit): MojangResponse? {
+        val response = requestAuthData()
+        if (!response.status.isSuccess()) {
+            onRequestError(response, flowData)
+            return null
+        }
+
+        return json.decodeFromString(MojangResponse.serializer(), response.bodyAsText())
+    }
+
+    /**
+     * Requests the mojang access token from the login endpoint.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    override suspend fun requestAuthData(): HttpResponse {
         val payload = MojangPayload(
             identityToken = "XBL3.0 x=${xstsResponse.displayClaims.xui[0].uhs};${xstsResponse.token}"
         )
@@ -67,12 +102,6 @@ public class MojangBuilder internal constructor(
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(MojangPayload.serializer(), payload))
         }
-
-        if (!response.status.isSuccess()) {
-            onRequestError(response)
-            return null
-        }
-
-        return json.decodeFromString(MojangResponse.serializer(), response.bodyAsText())
+        return response
     }
 }

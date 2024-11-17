@@ -13,6 +13,7 @@
 
 package dev.redtronics.mokt.builder.mojang
 
+import dev.redtronics.mokt.flows.GameAuthData
 import dev.redtronics.mokt.payload.XBoxPayload
 import dev.redtronics.mokt.payload.XBoxProperties
 import dev.redtronics.mokt.response.mojang.XBoxResponse
@@ -46,7 +47,7 @@ public class XBoxBuilder internal constructor(
      * @author Nils Jäkel
      * */
     private val accessToken: String
-) : MinecraftAuthBuilder() {
+) : GameAuthBuilder() {
     /**
      * The relying party url.
      *
@@ -101,6 +102,41 @@ public class XBoxBuilder internal constructor(
      * @author Nils Jäkel
      * */
     internal suspend fun build(onRequestError: suspend (response: HttpResponse) -> Unit): XBoxResponse? {
+        val response = requestAuthData()
+        if (!response.status.isSuccess()) {
+            onRequestError(response)
+            return null
+        }
+
+        return json.decodeFromString(XBoxResponse.serializer(), response.bodyAsText())
+    }
+
+    /**
+     * Executes the XBox access token response.
+     *
+     * @param flowData The flow data.
+     * @param onRequestError The function to be called if an error occurs during the XBox access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    internal suspend fun <T : GameAuthData> build(flowData: T, onRequestError: suspend (response: HttpResponse, flowData: T) -> Unit): XBoxResponse? {
+        val response = requestAuthData()
+        if (!response.status.isSuccess()) {
+            onRequestError(response, flowData)
+            return null
+        }
+
+        return json.decodeFromString(XBoxResponse.serializer(), response.bodyAsText())
+    }
+
+    /**
+     * Executes the XBox access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    override suspend fun requestAuthData(): HttpResponse {
         val payload = XBoxPayload(
             properties = XBoxProperties(
                 authMethod = authMethod,
@@ -116,13 +152,7 @@ public class XBoxBuilder internal constructor(
             contentType(ContentType.Application.Json)
             setBody(json.encodeToString(XBoxPayload.serializer(), payload))
         }
-
-        if (!response.status.isSuccess()) {
-            onRequestError(response)
-            return null
-        }
-
-        return json.decodeFromString(XBoxResponse.serializer(), response.bodyAsText())
+        return response
     }
 }
 

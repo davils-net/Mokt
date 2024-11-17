@@ -9,18 +9,14 @@
  * and/or sell copies of the Software.
  */
 
-package dev.redtronics.mokt.builder.mojang
-
-import io.ktor.client.*
-import kotlinx.serialization.json.Json
+package dev.redtronics.mokt.annotations
 
 /**
- * Base class for all mojang authentication builders.
+ * Marks an API as experimental and unstable.
  *
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-public abstract class MinecraftAuthBuilder {
-    internal abstract val httpClient: HttpClient
-    internal abstract val json: Json
-}
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
+@RequiresOptIn("This API is experimental and unstable.")
+public annotation class Experimental

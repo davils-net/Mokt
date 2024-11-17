@@ -17,10 +17,13 @@ import dev.redtronics.mokt.builder.mojang.MojangBuilder
 import dev.redtronics.mokt.builder.mojang.RelyingParty
 import dev.redtronics.mokt.builder.mojang.XBoxBuilder
 import dev.redtronics.mokt.builder.mojang.XstsBuilder
+import dev.redtronics.mokt.flows.*
 import dev.redtronics.mokt.response.mojang.MojangResponse
 import dev.redtronics.mokt.response.mojang.XBoxResponse
 import dev.redtronics.mokt.response.mojang.XstsResponse
 import io.ktor.client.statement.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 
 /**
  * Implements the complete mojang authentication to the provider, that is inherited from [GameAuth].
@@ -50,10 +53,35 @@ public abstract class GameAuth<out T : Provider> internal constructor() {
     public suspend fun xBox(
         accessToken: String,
         onRequestError: suspend (response: HttpResponse) -> Unit = {},
-        builder: suspend XBoxBuilder.() -> Unit = {}
+        builder: suspend XBoxBuilder.() -> Unit = {},
     ): XBoxResponse? {
         val xBoxBuilder = XBoxBuilder(provider.httpClient, provider.json, accessToken).apply { builder() }
         return xBoxBuilder.build(onRequestError)
+    }
+
+    /**
+     * Interacts with the XBox endpoint to get the XBox access token.
+     *
+     * @param accessToken The microsoft access token.
+     * @param onRequestError The function to be called if an error occurs during the XBox access token request.
+     * @param builder The builder to configure the XBox access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    public fun <T : GameAuthData> xBox(
+        accessToken: String,
+        onRequestError: suspend (response: HttpResponse, flowData: T) -> Unit = { _, flowData -> flowData.cancel() },
+        builder: suspend XBoxBuilder.() -> Unit = {},
+    ): FlowStep<T, AuthProgress<GameAuthState>> = object : FlowStep<T, AuthProgress<GameAuthState>> {
+        override suspend fun execute(flowData: T): Flow<AuthProgress<GameAuthState>> = channelFlow {
+            send(AuthProgress(1, 2, GameAuthState.REQUEST_XBOX_TOKEN))
+
+            val xBoxBuilder = XBoxBuilder(provider.httpClient, provider.json, accessToken).apply { builder() }
+            val response = xBoxBuilder.build(flowData, onRequestError)
+            flowData.xBoxResponse = response
+            send(AuthProgress(2, 2, GameAuthState.REQUEST_XBOX_TOKEN))
+        }
     }
 
     /**
@@ -69,7 +97,7 @@ public abstract class GameAuth<out T : Provider> internal constructor() {
     public suspend fun xsts(
         xBoxResponse: XBoxResponse,
         onRequestError: suspend (response: HttpResponse) -> Unit = {},
-        builder: suspend XstsBuilder.() -> Unit
+        builder: suspend XstsBuilder.() -> Unit,
     ): XstsResponse? {
         val xstsBuilder = XstsBuilder(provider.httpClient, provider.json, xBoxResponse).apply { builder() }
         return xstsBuilder.build(onRequestError)
@@ -87,13 +115,41 @@ public abstract class GameAuth<out T : Provider> internal constructor() {
      * */
     public suspend fun xsts(
         xBoxResponse: XBoxResponse,
+        relyingParty: RelyingParty = RelyingParty.JAVA,
         onRequestError: suspend (response: HttpResponse) -> Unit = {},
-        relyingParty: RelyingParty = RelyingParty.JAVA
     ): XstsResponse? {
         val xsts = xsts(xBoxResponse, onRequestError) {
             this.relyingParty = relyingParty
         }
         return xsts
+    }
+
+    /**
+     * Interacts with the microsoft store endpoint to get the xsts access token.
+     *
+     * @param onRequestError The function to be called if an error occurs during the xsts access token request.
+     * @param builder The builder to configure the xsts access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    public fun <T : GameAuthData> xsts(
+        onRequestError: suspend (response: HttpResponse, flowData: T) -> Unit = { _, flowData -> flowData.cancel() },
+        builder: suspend XstsBuilder.() -> Unit = {},
+    ): FlowStep<T, AuthProgress<GameAuthState>> = object : FlowStep<T, AuthProgress<GameAuthState>> {
+        override suspend fun execute(flowData: T): Flow<AuthProgress<GameAuthState>> = channelFlow {
+            send(AuthProgress(1, 2, GameAuthState.REQUEST_XSTS_TOKEN))
+            if (flowData.xBoxResponse == null) {
+                send(AuthProgress(2, 2, GameAuthState.REQUEST_XSTS_TOKEN))
+                return@channelFlow
+            }
+
+            val xstsBuilder = XstsBuilder(provider.httpClient, provider.json, flowData.xBoxResponse!!).apply { builder() }
+            val response = xstsBuilder.build(flowData, onRequestError)
+
+            flowData.xstsResponse = response
+            send(AuthProgress(2, 2, GameAuthState.REQUEST_XSTS_TOKEN))
+        }
     }
 
     /**
@@ -109,9 +165,37 @@ public abstract class GameAuth<out T : Provider> internal constructor() {
     public suspend fun mojang(
         xstsResponse: XstsResponse,
         onRequestError: suspend (response: HttpResponse) -> Unit = {},
-        builder: suspend MojangBuilder.() -> Unit = {}
+        builder: suspend MojangBuilder.() -> Unit = {},
     ): MojangResponse? {
         val mojangBuilder = MojangBuilder(provider.httpClient, provider.json, xstsResponse).apply { builder() }
         return mojangBuilder.build(onRequestError)
+    }
+
+    /**
+     * Interacts with the mojang endpoint to get the mojang access token.
+     *
+     * @param onRequestError The function to be called if an error occurs during the mojang access token request.
+     * @param builder The builder to configure the mojang access token request.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    public fun <T : GameAuthData> mojang(
+        onRequestError: suspend (response: HttpResponse, flowData: T) -> Unit = { _, flowData -> flowData.cancel() },
+        builder: suspend MojangBuilder.() -> Unit = {},
+    ): FlowStep<T, AuthProgress<GameAuthState>> = object : FlowStep<T, AuthProgress<GameAuthState>> {
+        override suspend fun execute(flowData: T): Flow<AuthProgress<GameAuthState>> = channelFlow {
+            send(AuthProgress(1, 2, GameAuthState.REQUEST_MOJANG_TOKEN))
+            if (flowData.xstsResponse == null) {
+                send(AuthProgress(2, 2, GameAuthState.REQUEST_MOJANG_TOKEN))
+                return@channelFlow
+            }
+
+            val mojangBuilder = MojangBuilder(provider.httpClient, provider.json, flowData.xstsResponse!!).apply { builder() }
+            val response = mojangBuilder.build(flowData, onRequestError)
+
+            flowData.mojangResponse = response
+            send(AuthProgress(2, 2, GameAuthState.REQUEST_MOJANG_TOKEN))
+        }
     }
 }
