@@ -135,7 +135,7 @@ public abstract class GameAuth<out T : Provider> internal constructor() {
      * */
     public fun <T : GameAuthData> xsts(
         onRequestError: suspend (response: HttpResponse, flowData: T) -> Unit = { _, flowData -> flowData.cancel() },
-        builder: suspend XstsBuilder.() -> Unit,
+        builder: suspend XstsBuilder.() -> Unit = {},
     ): FlowStep<T, AuthProgress<GameAuthState>> = object : FlowStep<T, AuthProgress<GameAuthState>> {
         override suspend fun execute(flowData: T): Flow<AuthProgress<GameAuthState>> = channelFlow {
             send(AuthProgress(1, 2, GameAuthState.REQUEST_XSTS_TOKEN))
@@ -196,6 +196,26 @@ public abstract class GameAuth<out T : Provider> internal constructor() {
 
             flowData.mojangResponse = response
             send(AuthProgress(2, 2, GameAuthState.REQUEST_MOJANG_TOKEN))
+        }
+    }
+
+    /**
+     * Executes the game auth flow.
+     *
+     * @param data The data to be used in the flow.
+     * @param accessToken The access token to be used in the flow.
+     * @param steps The steps to be executed in the flow.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    public suspend fun <T : GameAuthData> mojangAccessFlow(
+        data: T,
+        accessToken: String,
+        vararg steps: FlowStep<T, AuthProgress<GameAuthState>> = arrayOf(xBox<T>(accessToken), xsts(), mojang()),
+    ): Flow<AuthProgress<GameAuthState>> = flow(data) {
+        steps.forEach {
+            step(it)
         }
     }
 }
