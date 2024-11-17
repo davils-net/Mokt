@@ -476,7 +476,17 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
         return response
     }
 
-    public suspend fun <T : DeviceAuthData> asFlow(
+    /**
+     * Builds a [Flow] for the device authorization process.
+     *
+     * @param data The data to be used in the flow.
+     * @param displayUserCode The function to display the user code.
+     * @param steps The steps to be executed in the flow.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    public suspend fun <T : DeviceAuthData> accessFlow(
         data: T,
         displayUserCode: suspend UserCodeBuilder.() -> Unit = { inBrowser() },
         vararg steps: FlowStep<T, AuthProgress<OAuthState>> = arrayOf(authorizationCode<T>(), displayCode(displayUserCode), accessToken()),
