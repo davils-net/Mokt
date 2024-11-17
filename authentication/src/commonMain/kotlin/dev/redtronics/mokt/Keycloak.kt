@@ -203,7 +203,7 @@ public class Keycloak internal constructor(
 
             val microsoftAccessResponse= json.decodeFromString(AccessResponse.serializer(), response.bodyAsText())
             flowData.microsoftAccessResponse = microsoftAccessResponse
-            send(AuthProgress(1, 2, OAuthState.REQUEST_ACCESS_TOKEN))
+            send(AuthProgress(2, 2, OAuthState.REQUEST_ACCESS_TOKEN))
         }
     }
 
