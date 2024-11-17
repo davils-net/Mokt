@@ -87,6 +87,31 @@ public abstract class DeviceAuthData(
 ) : AuthData()
 
 /**
+ * The Keycloak authentication data.
+ *
+ * @since 0.0.1
+ * @author Nils Jäkel
+ * */
+@Serializable
+public abstract class KeycloakAuthData : AuthData() {
+    /**
+     * The keycloak access response.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    override var accessResponse: AccessResponse? = null
+
+    /**
+     * The requested microsoft access response from keycloak provider.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    public var microsoftAccessResponse: AccessResponse? = null
+}
+
+/**
  * The flow data for the game authentication.
  *
  * @since 0.0.1
