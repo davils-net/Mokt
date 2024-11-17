@@ -308,6 +308,15 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
         )
         return response
     }
+
+    public suspend fun <T : GrantAuthData> asFlow(
+        data: T,
+        vararg steps: FlowStep<T, AuthProgress<OAuthState>> = arrayOf(grantCode<T>(), accessToken()),
+    ): Flow<AuthProgress<OAuthState>> = flow(data) {
+        steps.forEach {
+            step(it)
+        }
+    }
 }
 
 /**

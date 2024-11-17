@@ -475,4 +475,14 @@ public abstract class DeviceAuth<out T : Provider> internal constructor() : OAut
         )
         return response
     }
+
+    public suspend fun <T : DeviceAuthData> asFlow(
+        data: T,
+        displayUserCode: suspend UserCodeBuilder.() -> Unit = { inBrowser() },
+        vararg steps: FlowStep<T, AuthProgress<OAuthState>> = arrayOf(authorizationCode<T>(), displayCode(displayUserCode), accessToken()),
+    ): Flow<AuthProgress<OAuthState>> = flow(data) {
+        steps.forEach {
+            step(it)
+        }
+    }
 }
