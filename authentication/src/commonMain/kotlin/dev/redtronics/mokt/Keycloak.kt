@@ -153,14 +153,6 @@ public class Keycloak internal constructor(
         return builder(keycloakBuilder)
     }
 
-    public fun grantFlow() {
-
-    }
-
-    public fun deviceFlow() {
-
-    }
-
     /**
      * Requests the microsoft access token from the keycloak token endpoint.
      *
