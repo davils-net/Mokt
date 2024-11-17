@@ -309,7 +309,16 @@ public abstract class GrantAuth<out T : Provider> internal constructor() : OAuth
         return response
     }
 
-    public suspend fun <T : GrantAuthData> asFlow(
+    /**
+     * Requests the access token from the token endpoint as [Flow].
+     *
+     * @param data The data to be used in the flow.
+     * @param steps The steps to be executed.
+     *
+     * @since 0.0.1
+     * @author Nils Jäkel
+     * */
+    public suspend fun <T : GrantAuthData> accessFlow(
         data: T,
         vararg steps: FlowStep<T, AuthProgress<OAuthState>> = arrayOf(grantCode<T>(), accessToken()),
     ): Flow<AuthProgress<OAuthState>> = flow(data) {
