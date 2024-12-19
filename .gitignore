@@ -47,3 +47,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Rust ###
+cinterop
+target
