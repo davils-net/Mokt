@@ -17,9 +17,11 @@ import com.github.ajalt.mordant.terminal.Terminal
 import dev.redtronics.mokt.GrantType
 import dev.redtronics.mokt.OAuth
 import dev.redtronics.mokt.Provider
-import dev.redtronics.mokt.build.BuildConstants
 import dev.redtronics.mokt.builder.device.code.UserCodeBuilder
-import dev.redtronics.mokt.flows.*
+import dev.redtronics.mokt.flows.AuthProgress
+import dev.redtronics.mokt.flows.DeviceAuthData
+import dev.redtronics.mokt.flows.FlowStep
+import dev.redtronics.mokt.flows.OAuthState
 import dev.redtronics.mokt.html.WebTheme
 import dev.redtronics.mokt.html.userCodePage
 import dev.redtronics.mokt.network.interval
@@ -38,6 +40,7 @@ import io.ktor.util.date.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.html.HTML
+import net.davils.mokt.build.BuildConstants
 import kotlin.time.Duration.Companion.seconds
 
 /**

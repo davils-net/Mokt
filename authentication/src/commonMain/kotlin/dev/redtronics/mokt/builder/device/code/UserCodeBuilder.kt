@@ -14,7 +14,6 @@
 package dev.redtronics.mokt.builder.device.code
 
 import com.github.ajalt.mordant.terminal.Terminal
-import dev.redtronics.mokt.build.BuildConstants
 import dev.redtronics.mokt.html.WebTheme
 import dev.redtronics.mokt.html.userCodePage
 import dev.redtronics.mokt.response.device.DeviceCodeResponse
@@ -23,6 +22,7 @@ import io.ktor.http.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import kotlinx.html.HTML
+import net.davils.mokt.build.BuildConstants
 
 /**
  * Builder for displaying the user code.

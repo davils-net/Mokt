@@ -11,12 +11,14 @@
 
 package dev.redtronics.mokt.network
 
-import dev.redtronics.mokt.cinterop.open_url
 import io.ktor.http.*
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import net.davils.cinterop.open_url
 
+@OptIn(ExperimentalForeignApi::class)
 public actual suspend fun openInBrowser(url: Url): Unit = withContext(Dispatchers.IO) {
     open_url(url.toString())
 }
