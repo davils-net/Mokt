@@ -1,3 +1,4 @@
+
 /*
  * MIT License
  * Copyright 2024 Nils Jäkel & David Ernst
@@ -9,80 +10,37 @@
  * and/or sell copies of the Software.
  */
 
-import kotlin.io.path.Path
+import net.davils.kreate.feature.cinterop.Target
 
 plugins {
-    `mokt-publishing`
     `mokt-multiplatform`
-    `mokt-cinterop-generation`
-    `mokt-android`
-    `mokt-build-constants`
 }
 
 repositories {
     mavenCentral()
-    google()
 }
 
 group = Project.GROUP
 
+kreate {
+    cinterop {
+        enabled = true
+        cBindVersion = "0.27.0"
+        libCVersion = "0.2.169"
+        applyTargetsWithoutRust = false
+        targets(
+            Target.LINUX,
+            Target.WINDOWS,
+            Target.IOS,
+            Target.TVOS,
+            Target.MACOS,
+            Target.WATCHOS
+        )
+    }
+}
+
+
 kotlin {
-    js(IR) {
-        generateTypeScriptDefinitions()
-        nodejs()
-        useEsModules()
-        binaries.library()
-    }
-    
-    val nativeDefFilePath = Path("../native-cinterop/cinterop.def")
-    linuxX64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-
-    mingwX64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-    
-    macosX64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-    macosArm64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-
-    iosArm64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-    iosX64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-    iosSimulatorArm64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-
-    watchosArm32 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-    watchosArm64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-    watchosX64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-    watchosSimulatorArm64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-
-    tvosArm64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-    tvosX64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-    tvosSimulatorArm64 {
-        applyCInteropGeneration(nativeDefFilePath)
-    }
-
     sourceSets {
         commonMain {
             dependencies {
@@ -124,14 +82,6 @@ kotlin {
             }
         }
 
-        jsMain {
-            dependencies {
-                api(libs.kotlinx.coroutines.core.js)
-                api(libs.ktor.client.js)
-                implementation(npm("open", "10.1.0"))
-            }
-        }
-
         linuxMain {
             dependencies {
                 api(libs.ktor.client.cio)
@@ -141,14 +91,6 @@ kotlin {
         mingwMain {
             dependencies {
                 api(libs.ktor.client.winhttp)
-            }
-        }
-
-        androidMain {
-            dependencies {
-                api(libs.kotlinx.coroutines.android)
-                api(libs.ktor.client.android)
-                implementation(libs.androidx.browser)
             }
         }
 
@@ -175,19 +117,5 @@ kotlin {
                 api(libs.ktor.client.darwin)
             }
         }
-
-        all {
-            languageSettings {
-                optIn("kotlinx.cinterop.UnsafeNumber")
-                optIn("kotlinx.cinterop.ExperimentalForeignApi")
-                optIn("kotlin.experimental.ExperimentalNativeApi")
-                optIn("kotlin.native.runtime.NativeRuntimeApi")
-                optIn("kotlin.ExperimentalStdlibApi")
-            }
-        }
     }
-}
-
-android {
-    namespace = group.toString()
 }

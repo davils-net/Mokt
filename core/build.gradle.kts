@@ -1,3 +1,5 @@
+import net.davils.kreate.feature.cinterop.Target
+
 /*
  * MIT License
  * Copyright 2024 Nils Jäkel & David Ernst
@@ -10,40 +12,27 @@
  */
 
 plugins {
-    `mokt-publishing`
     `mokt-multiplatform`
-    `mokt-build-constants`
 }
 
 group = Project.GROUP
 
-kotlin {
-    js(IR) {
-        generateTypeScriptDefinitions()
-        nodejs()
-        useEsModules()
-        binaries.library()
+kreate {
+    cinterop {
+        enabled = true
+        applyTargetsWithoutRust = true
+        targets(
+            Target.LINUX,
+            Target.WINDOWS,
+            Target.IOS,
+            Target.TVOS,
+            Target.MACOS,
+            Target.WATCHOS
+        )
     }
+}
 
-    linuxX64()
-    mingwX64()
-
-    macosX64()
-    macosArm64()
-
-    iosArm64()
-    iosX64()
-    iosSimulatorArm64()
-
-    watchosArm32()
-    watchosArm64()
-    watchosX64()
-    watchosSimulatorArm64()
-
-    tvosArm64()
-    tvosX64()
-    tvosSimulatorArm64()
-
+kotlin {
     sourceSets {
         commonMain {
             dependencies {

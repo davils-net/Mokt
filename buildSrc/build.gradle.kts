@@ -16,10 +16,11 @@ plugins {
 repositories {
     mavenCentral()
     gradlePluginPortal()
-    google()
+    maven("https://gitlab.davils.net/api/v4/projects/3/packages/maven")
 }
 
 kotlin {
+    explicitApi()
     compilerOptions {
         allWarningsAsErrors = true
     }
