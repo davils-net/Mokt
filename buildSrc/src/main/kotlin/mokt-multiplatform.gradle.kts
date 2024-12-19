@@ -9,6 +9,7 @@
  * and/or sell copies of the Software.
  */
 
+import net.davils.kreate.feature.core.Entry
 import net.davils.kreate.feature.core.License
 
 plugins {
@@ -27,6 +28,13 @@ kreate {
         name = Project.NAME
         description = Project.DESCRIPTION
         license = License.MIT
+        patchEntries = listOf(
+            Entry(
+                file = rootProject.projectDir.resolve("docs/writerside.cfg"),
+                regex = Regex("[0-9]+\\.[0-9]+\\.[0-9]+"),
+                newContent = version.toString()
+            )
+        )
         allWarningsAsErrors = true
         isExplicitApiMode = true
     }
