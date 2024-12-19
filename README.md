@@ -15,11 +15,11 @@ Some plugins and features of Mokt are not available on all platforms.
 
 The following platforms are supported:
 
-| Plugin         | JVM | JS | Linux | Windows | Android | Macos | Ios | Tvos | Watchos |
-|----------------|-----|----|-------|---------|---------|-------|-----|------|---------|
-| common         | ✅   | ✅  | ✅     | ✅       | ✅       | ✅     | ✅   | ✅    | ✅       |
-| core           | ✅   | ✅  | ✅     | ✅       | ✅       | ✅     | ✅   | ✅    | ✅       |
-| authentication | ✅   | ❌  | ✅     | ❌       | ❌       | ✅     | ✅   | ✅    | ✅       |
+| Plugin         | JVM | Linux | Windows | Macos | Ios | Tvos | Watchos |
+|----------------|-----|-------|---------|-------|-----|------|---------|
+| common         | ✅   | ✅     | ✅       | ✅     | ✅   | ✅    | ✅       |
+| core           | ✅   | ✅     | ✅       | ✅     | ✅   | ✅    | ✅       |
+| authentication | ✅   | ✅     | ❌       | ✅     | ✅   | ✅    | ✅       |
 
 ## Getting Started
 
