@@ -15,10 +15,8 @@
  * @since 0.0.1
  * @author Nils Jäkel
  * */
-object Project {
-    const val NAME = "Mokt"
-    const val DESCRIPTION = "A Kotlin Multiplatform SDK for interaction with the Minecraft World."
-    const val GROUP = "dev.redtronics.mokt"
-    const val URL = "https://mokt.redtronics.dev"
-    const val GITLAB_URL = "https://code.redtronics.dev"
+public object Project {
+    public const val NAME: String = "Mokt"
+    public const val DESCRIPTION: String = "A Kotlin Multiplatform SDK for interaction with the Minecraft World."
+    public const val GROUP: String = "net.davils.mokt"
 }
