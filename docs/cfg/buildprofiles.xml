@@ -19,9 +19,9 @@
     </build-profile>
 
     <footer>
-        <social type="email" href="mailto:mokt@redtronics.dev"/>
-        <link href="https://issues.redtronics.dev/issues/MOK">Issue tracker</link>
-        <copyright>2024 Nils Jäkel & David Ernst</copyright>
+        <social type="email" href="mailto:contact@davils.net"/>
+        <link href="https://youtrack.davils.net/issues/MOK">Issue tracker</link>
+        <copyright>2024 Davils</copyright>
     </footer>
 
 </buildprofiles>
