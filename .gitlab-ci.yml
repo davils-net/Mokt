@@ -16,5 +16,5 @@ stages:
 variables:
   CINTEROP_ENABLED: "true"
   TESTS_ENABLED: "true"
-  JDK_VERSION: "jdk8"
+  JDK_VERSION: "jdk17-graal"
   WRITERSIDE_INSTANCE: "docs/m"
