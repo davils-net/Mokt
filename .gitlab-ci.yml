@@ -6,6 +6,13 @@ include:
     ref: "main"
     file: "writerside.yaml"
 
+stages:
+  - build
+  - test
+  - publish
+  - writerside-build
+  - writerside-test
+
 variables:
   CINTEROP_ENABLED: "true"
   TESTS_ENABLED: "true"
