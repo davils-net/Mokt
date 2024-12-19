@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.0.21"
+kotlin = "2.1.0"
 idea-ext = "1.1.9"
 dokka = "1.9.20"
 android = "8.5.2"
@@ -13,12 +13,11 @@ mordant = "3.0.1"
 slf4j = "2.0.16"
 logback = "1.5.12"
 atomicfu = "0.26.0"
+kreate = "0.0.3"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-debug = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-debug", version.ref = "coroutines" }
-kotlinx-coroutines-core-js = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-js", version.ref = "coroutines" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version.ref = "coroutines" }
 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
@@ -50,24 +49,17 @@ slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
 mordant = { module = "com.github.ajalt.mordant:mordant", version.ref = "mordant" }
-androidx-browser = { module = "androidx.browser:browser", version.ref = "android-browser" }
 
 # actual plugins, but needed as dependencies in buildSrc
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-idea-ext-gradle-plugin = { module = "gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext", version.ref = "idea-ext" }
-dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
-android-library-gradle-plugin = { module = "com.android.library:com.android.library.gradle.plugin", version.ref = "android" }
 serialization-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
-kotest-gradle-plugin = { module = "io.kotest:kotest-framework-multiplatform-plugin-gradle", version.ref = "kotest" }
 atomicfu-gradle-plugin = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicfu" }
+kreate-gradle-plugin = { module = "net.davils.kreate:net.davils.kreate.gradle.plugin", version.ref = "kreate" }
 
 [bundles]
 build-src = [
     "kotlin-gradle-plugin",
-    "idea-ext-gradle-plugin",
-    "dokka-gradle-plugin",
-    "android-library-gradle-plugin",
     "serialization-gradle-plugin",
-    "kotest-gradle-plugin",
-    "atomicfu-gradle-plugin"
+    "atomicfu-gradle-plugin",
+    "kreate-gradle-plugin"
 ]
