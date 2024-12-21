@@ -9,7 +9,7 @@ mordant = "3.0.1"
 slf4j = "2.0.16"
 logback = "1.5.12"
 atomicfu = "0.26.1"
-kreate = "0.0.3"
+kreate = "0.0.3.2"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
