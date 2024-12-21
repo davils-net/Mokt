@@ -1,15 +1,15 @@
-import net.davils.kreate.feature.cinterop.Target
-
 /*
  * MIT License
- * Copyright 2024 Nils Jäkel & David Ernst
+ * Copyright 2024 Davils
  *
  * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the “Software”),
+ * a copy of this software and associated documentation files (the "Software”),
  * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software.
  */
+
+import net.davils.kreate.feature.cinterop.Target
 
 plugins {
     `mokt-multiplatform`
@@ -57,6 +57,7 @@ kotlin {
 
 kreate {
     buildConstants {
+        onlyInternal = false
         properties = mapOf(
             "MOKT_LOGO_URL" to "https://code.redtronics.dev/nils.jaekel/mokt/-/raw/master/assets/mokt_m_alpha.png?ref_type=heads",
             "MOKT_DEVICE_CODE_BACKGROUND" to "https://code.redtronics.dev/nils.jaekel/mokt/-/raw/master/assets/background.png?ref_type=heads"
