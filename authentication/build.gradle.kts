@@ -23,6 +23,13 @@ kreate {
         applyTargetsWithoutRust = true
         targets(Target.LINUX)
     }
+
+    buildConstants {
+        properties = mapOf(
+            "MOKT_LOGO_URL" to "https://code.redtronics.dev/nils.jaekel/mokt/-/raw/master/assets/mokt_m_alpha.png?ref_type=heads",
+            "MOKT_DEVICE_CODE_BACKGROUND" to "https://code.redtronics.dev/nils.jaekel/mokt/-/raw/master/assets/background.png?ref_type=heads"
+        )
+    }
 }
 
 kotlin {
@@ -52,15 +59,5 @@ kotlin {
                 implementation(libs.kotest.runner.junit5)
             }
         }
-    }
-}
-
-kreate {
-    buildConstants {
-        onlyInternal = false
-        properties = mapOf(
-            "MOKT_LOGO_URL" to "https://code.redtronics.dev/nils.jaekel/mokt/-/raw/master/assets/mokt_m_alpha.png?ref_type=heads",
-            "MOKT_DEVICE_CODE_BACKGROUND" to "https://code.redtronics.dev/nils.jaekel/mokt/-/raw/master/assets/background.png?ref_type=heads"
-        )
     }
 }
