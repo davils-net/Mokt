@@ -7,3 +7,27 @@
 # the rights to use, copy, modify, merge, publish, distribute, sublicense,
 # and/or sell copies of the Software.
 
+services:
+  docs:
+    container_name: mokt-docs
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - "80:80"
+    deploy:
+      resources:
+        reservations:
+          cpus: "0.5"
+          memory: 50M
+        limits:
+          memory: 200M
+    privileged: false
+    restart: no
+    stdin_open: false
+    tty: false
+    networks:
+      - mokt
+networks:
+  mokt:
+    driver: bridge
